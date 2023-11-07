@@ -120,12 +120,12 @@ NETWORK=$((RANDOM%253+2))
 # https://gist.github.com/74e9875d5ab0a2bc1010447f1bee5d0a
 
 setParameters() {
-
+    echo "Start"
     # verify if getopt is available
     getopt --test > /dev/null
     [ $? -ne 4 ] && { error $LINENO "${FUNCNAME[0]}(): getopt not available 
         for parsing arguments."; }
-
+    echo "getopt"
     # define the flags for the parameters
     # ':' means that the flag expects an argument.
     SHORT=n:,h
@@ -137,7 +137,7 @@ setParameters() {
                     -- "$@") || { error $LINENO "${FUNCNAME[0]}(): getopt failed parsing options"; }
 
     eval set -- "${PARSED}"
-
+    echo "parsing"
     while [ $# -gt 1 ]; do
         #echo "parsing arg: $1 $2"
         case "$1" in
@@ -150,8 +150,9 @@ setParameters() {
         esac
         shift || true      # skip to next option-argument pair
     done
-
+    echo "parsed"
      # node already in use check
     nodetasks=$(pgrep -facu "$(id -u)" "${NODES[0]}")
     [ "$nodetasks" -gt 4 ] && {error $LINENO "${FUNCNAME[0]}(): it appears host ${NODES[0]} is currently in use";}
+    echo "Final"
 }
