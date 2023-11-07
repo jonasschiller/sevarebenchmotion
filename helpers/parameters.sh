@@ -136,7 +136,7 @@ setParameters() {
                     --name "$0" \
                     -- "$@") || { error $LINENO "${FUNCNAME[0]}(): getopt failed parsing options"; }
 
-    eval set -- "${PARSED}"
+    set -- "${PARSED}"
     echo "parsing"
     while [ $# -gt 1 ]; do
         #echo "parsing arg: $1 $2"
@@ -146,13 +146,15 @@ setParameters() {
             -n|--nodes) 
                 setArray NODES "$2"
                 shift;;
-            *) {error $LINENO "${FUNCNAME[0]}(): unrecognized flag $1 $2";;}
+            *) error $LINENO "${FUNCNAME[0]}(): unrecognized flag $1 $2";;
         esac
         shift || true      # skip to next option-argument pair
     done
     echo "parsed"
      # node already in use check
-    nodetasks=$(pgrep -facu "$(id -u)" "${NODES[0]}")
-    [ "$nodetasks" -gt 4 ] && {error $LINENO "${FUNCNAME[0]}(): it appears host ${NODES[0]} is currently in use";}
+    nodetasks=$(pgrep -fcu "$(id -u)" "${NODES[0]}")
+    if [ "$nodetasks" -gt 0 ]; then
+    error $LINENO "${FUNCNAME[0]}(): it appears host ${NODES[0]} is currently in use"
+    fi
     echo "Final"
 }
