@@ -153,7 +153,7 @@ setParameters() {
     echo "parsed"
      # node already in use check
     nodetasks=$(pgrep -fcu "$(id -u)" "${NODES[0]}")
-    if [ "$nodetasks" -gt 0 ]; then
+    if [ "$nodetasks" -gt 4 ]; then
     error $LINENO "${FUNCNAME[0]}(): it appears host ${NODES[0]} is currently in use"
     fi
     echo "Final"
