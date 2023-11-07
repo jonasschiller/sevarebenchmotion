@@ -171,19 +171,9 @@ setParameters() {
         shift || true      # skip to next option-argument pair
     done
 
-    # valid arguments check
-    nodecount="${#NODES[*]}"
-    [ "$requiredNODES" -gt "$nodecount" ] &&
-        usage "minimum NODEScount: $requiredNODES   given NODEScount: $nodecount"
-
      # node already in use check
     nodetasks=$(pgrep -facu "$(id -u)" "${NODES[0]}")
     [ "$nodetasks" -gt 4 ] && error $LINENO "${FUNCNAME[0]}(): it appears host ${NODES[0]} is currently in use"
-
-    # first, delete old flags
-    grep -Ev "compflags|progflags|runflags" "$parapath" > tmp$NETWORK
-    cat tmp$NETWORK > "$parapath"
-    rm "tmp$NETWORK"
 }
   
 
