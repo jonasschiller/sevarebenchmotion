@@ -28,17 +28,7 @@ initializePOS() {
 	for node in "${NODES[@]}"; do
 		# default variables file for all experiments
 		{ "$POS" alloc set_var "$node" global-variables.yml --as-global;
-
 		# default variables file for concrete experiment
-		echo experiment: "$EXPERIMENT" > experiment-variables.yml;
-		TEMPFILES+=( experiment-variables.yml )
-		"$POS" alloc set_var "$node" experiment-variables.yml --as-global;
-		# special variables for experiment run
-		"$POS" alloc set_var "$node" experiments/"$EXPERIMENT"/parameters.yml --as-global;
-
-		# loop variables for experiment script (append random num to mitigate conflicts)
-		loopvarpath="experiments/$EXPERIMENT/loop-variables-$NETWORK.yml"
-		"$POS" alloc set_var "$node" "$loopvarpath" --as-loop;
 		} || error ${LINENO} " ${FUNCNAME[0]} alloc set_var failed for $node"
 	done
 
@@ -60,10 +50,6 @@ setupExperiment() {
 	for node in "${NODES[@]}"; do
 		{ "$POS" comm laun --infile host_scripts/host_setup.sh --blocking "$node";
 		echo "      $node host setup successfull";
-		echo "    running experiment setup of $node";
-		"$POS" comm laun --blocking "$node" -- \
-			/bin/bash "$path"experiment-setup.sh "${PROTOCOLS[*]}" "$ipaddr" "$SWAP" "$NETWORK" "${NODES[*]}";
-		echo "      $node experiment setup successfull"; 
 		} &
 		PIDS+=( $! )
 		((++ipaddr))

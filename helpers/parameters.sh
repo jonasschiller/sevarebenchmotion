@@ -161,66 +161,6 @@ setParameters() {
             -n|--nodes) 
                 setArray NODES "$2"
                 shift;;
-            -p|--protocols) 
-                setArray PROTOCOLS "$2"
-                shift;;
-            --maldishonest)
-                PROTOCOLS+=( "${maldishonestProtocols[@]}" );;
-            --codishonest)
-                PROTOCOLS+=( "${covertdishonestProtocols[@]}" );;
-            --semidishonest)
-                PROTOCOLS+=( "${semidishonestProtocols[@]}" );;
-            --malhonest)
-                PROTOCOLS+=( "${malhonestProtocols[@]}" );;
-            --semihonest)
-                PROTOCOLS+=( "${semihonestProtocols[@]}" );;
-            --field)
-                PROTOCOLS+=( "${supportedFieldProtocols[@]}" );;
-            --ring)
-                PROTOCOLS+=( "${supportedRingProtocols[@]}" );;
-            --binary)
-                PROTOCOLS+=( "${supportedBinaryProtocols[@]}" );;
-            --all)
-                # remove real-bmr for explosive runtime costs, need to specify explicitly
-                PROTOCOLS=( "${supportedFieldProtocols[@]}" "${supportedRingProtocols[@]}" "${supportedBinaryProtocols[@]//real-bmr/}");;
-            -i|--input)
-                setArray INPUTS "$2"
-                shift;;
-            -m|--measureram)
-                TTYPES+=( MEASURERAM );;
-            # Host environment manipulation
-            -c|--cpu)
-                TTYPES+=( CPUS )
-                setArray CPUS "$2"
-                shift;;
-            -q|--cpuquota)
-                TTYPES+=( QUOTAS )
-                setArray QUOTAS "$2"
-                shift;;
-            -f|--freq)
-                TTYPES+=( FREQS )
-                setArray FREQS "$2"
-                shift;;
-            -r|--ram)
-                TTYPES+=( RAM )
-                setArray RAM "$2"
-                shift;;
-            # Network environment manipulation
-            -l|--latency)
-                TTYPES+=( LATENCIES )
-                setArray LATENCIES "$2"
-                shift;;
-            -b|--bandwidth)
-                TTYPES+=( BANDWIDTHS )
-                setArray BANDWIDTHS "$2"
-                shift;;
-            -d|--packetdrop)
-                TTYPES+=( PACKETDROPS )
-                setArray PACKETDROPS "$2"
-                shift;;
-            --swap)
-                SWAP="$2"
-                shift;;
             --config)
                 parseConfig "$2" "$4"
                 exit 0;;
@@ -231,121 +171,23 @@ setParameters() {
         shift || true      # skip to next option-argument pair
     done
 
-    # valid experiment check
-    if [ -f experiments/"$EXPERIMENT"/parameters.yml ]; then
-        # get experiment node count from experiment parameters file
-        requiredNODES=$(grep node_count experiments/"$EXPERIMENT"/parameters.yml | awk '{print $2}')
-        # check if the value node_count exists
-        [ "$requiredNODES" -lt 1 ] && requiredNODES="-1"
-    else
-        usage "Experiment $EXPERIMENT/parameters.yml not found"
-    fi
-
     # valid arguments check
     nodecount="${#NODES[*]}"
     [ "$requiredNODES" -gt "$nodecount" ] &&
         usage "minimum NODEScount: $requiredNODES   given NODEScount: $nodecount"
-    protocolcount="${#PROTOCOLS[*]}"
-    [ "$protocolcount" -lt 1 ] && 
-        usage "no protocols specified"
 
      # node already in use check
     nodetasks=$(pgrep -facu "$(id -u)" "${NODES[0]}")
     [ "$nodetasks" -gt 4 ] && error $LINENO "${FUNCNAME[0]}(): it appears host ${NODES[0]} is currently in use"
 
-    # add extra flags to parameters yaml
-    parapath=experiments/"$EXPERIMENT"/parameters.yml
-
     # first, delete old flags
     grep -Ev "compflags|progflags|runflags" "$parapath" > tmp$NETWORK
     cat tmp$NETWORK > "$parapath"
     rm "tmp$NETWORK"
-
-    if [ -n "$compflags" ]; then
-        echo -e "\ncompflags: $compflags" >> "$parapath"
-    else
-        echo -e "\ncompflags: " >> "$parapath"
-    fi
-
-    if [ -n "$progflags" ]; then
-        echo -e "\nprogflags: $progflags" >> "$parapath"
-    else
-        echo -e "\nprogflags: " >> "$parapath"
-    fi
-
-    if [ -n "$runflags" ]; then
-        echo -e "\nrunflags: $runflags" >> "$parapath"
-    else
-        echo -e "\nrunflags: " >> "$parapath"
-    fi
-
-    # split up protocols to computation domains
-    for protocol in "${PROTOCOLS[@]}"; do
-        if [[ " ${supportedFieldProtocols[*]} " == *" $protocol "* ]]; then
-            # filter duplicats
-            [[ " ${FIELDPROTOCOLS[*]} " == *" $protocol "* ]] || FIELDPROTOCOLS+=( "$protocol" )
-        elif [[ " ${supportedRingProtocols[*]} " == *" $protocol "* ]]; then
-            [[ " ${RINGPROTOCOLS[*]} " == *" $protocol "* ]] || RINGPROTOCOLS+=( "$protocol" )
-        elif [[ " ${supportedBinaryProtocols[*]} " == *" $protocol "* ]]; then
-            [[ " ${BINARYPROTOCOLS[*]} " == *" $protocol "* ]] || BINARYPROTOCOLS+=( "$protocol" )
-        else
-            warning "protocol $protocol was not found, skipping"
-        fi
-    done
-
-    # activate computation domain for later handling
-    [ "${#FIELDPROTOCOLS[*]}" -gt 0 ] && CDOMAINS+=( FIELD )
-    [ "${#RINGPROTOCOLS[*]}" -gt 0 ] && CDOMAINS+=( RING )
-    [ "${#BINARYPROTOCOLS[*]}" -gt 0 ] && CDOMAINS+=( BINARY )
-
-    # append -party.x to all protocols
-    for cdomain in "${CDOMAINS[@]}"; do
-        declare -n protos="${cdomain}PROTOCOLS"
-        protos=( "${protos[@]/%/-party.x}" )
-    done
-    PROTOCOLS=( "${FIELDPROTOCOLS[@]}" "${RINGPROTOCOLS[@]}" "${BINARYPROTOCOLS[@]}" )
-    
-    # generate loop-variables.yml (append random num to mitigate conflicts)
-    loopvarpath="experiments/$EXPERIMENT/loop-variables-$NETWORK.yml"
-    rm -f "$loopvarpath"
-    for type in "${TTYPES[@]}"; do
-        declare -n ttypes="${type}"
-        parameters="${ttypes[*]}"
-        echo "${type,,}: [${parameters// /, }]" >> "$loopvarpath"
-    done
-    parameters="${INPUTS[*]}"
-    echo "input_size: [${parameters// /, }]" >> "$loopvarpath"
-
-    # delete line measureram from loop_var, if active
-    sed -i '/measureram/d' "$loopvarpath"
-
-    # set default swap size, in case --ram is defined
-    [ "${#RAM[*]}" -gt 0 ] && SWAP=${SWAP:-4096}
-
-    # Experiment run summary  information output
-    SUMMARYFILE="$EXPORTPATH/E${EXPERIMENT::2}-run-summary.dat"
-    mkdir -p "$SUMMARYFILE" && rm -rf "$SUMMARYFILE"
-    {
-        echo "  Setup:"
-        echo "    Experiment = $EXPERIMENT $ETYPE"
-        echo "    Nodes = ${NODES[*]}"
-        echo "    Internal network = 10.10.$NETWORK.0/24"
-        echo "    Protocols:"
-        echo "      Field  = ${FIELDPROTOCOLS[*]/-party.x/}"
-        echo "      Ring   = ${RINGPROTOCOLS[*]/-party.x/}"
-        echo "      Binary = ${BINARYPROTOCOLS[*]/-party.x/}"
-        echo "    Inputs = ${INPUTS[*]}"
-        echo "    Compile flags: $compflags"
-        echo "    Program flags: $progflags"
-        echo "    Run flags: $runflags"
-        echo "    Testtypes:"
-        for type in "${TTYPES[@]}"; do
-            declare -n ttypes="${type}"
-            echo -e "      $type\t= ${ttypes[*]}"
-        done
-        echo "  Summary file = $SUMMARYFILE"
-    } | tee "$SUMMARYFILE"
 }
+  
+
+ 
 
 # inspired by https://unix.stackexchange.com/a/206216
 parseConfig() {

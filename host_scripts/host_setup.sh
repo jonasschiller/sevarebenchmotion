@@ -34,9 +34,15 @@ checkConnection "mirror.lrz.de"
 apt update
 apt install -y automake build-essential cmake git libboost-dev libboost-thread-dev \
     libntl-dev libsodium-dev libssl-dev libtool m4 python3 texinfo yasm linux-cpupower \
-    python3-pip time parted
+    python3-pip time parted libomp-dev htop
 pip3 install -U numpy
 checkConnection "github.com"
+echo 'deb http://deb.debian.org/debian testing main' > /etc/apt/sources.list.d/testing.list
+echo 'deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-17 main' > /etc/apt/sources.list
+echo 'deb-src http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-17 main' > /etc/apt/sources.list
+apt update -y
+apt install -y gcc-12 g++-12
+apt install -y clang-16 clang++-16
 git clone "$REPO" "$REPO_DIR"
 git clone "$REPO2" "$REPO2_DIR"
 
@@ -45,8 +51,13 @@ mkdir -p .config/htop
 cp "$REPO2_DIR"/helpers/htoprc ~/.config/htop/
 
 cd "$REPO_DIR"
-
-# use a custom state of the MP-SPDZ repo
-git checkout "$REPO_COMMIT"
+cd cmake
+sed -i 's/boost_1_76_0.tar.bz2/boost_1_83_0.tar.bz2/g' BuildBoostLocally.cmake
+sed -i 's/f0397ba6e982c4450f27bf32a2a83292aba035b827a5623a14636ea583318c41/6478edfe2f3305127cffe8caf73ea0176c53769f4bf1585be237eb30798c3b8e/g' BuildBoostLocally.cmake
+cd ..
+mkdir build
+cd build
+cmake ..
+make -j 4
 
 echo "global setup successful "
