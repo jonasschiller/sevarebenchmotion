@@ -128,8 +128,8 @@ setParameters() {
 
     # define the flags for the parameters
     # ':' means that the flag expects an argument.
-    SHORT=e:,n:,p:,i:,m,c:,q:,f:,r:,l:,b:,d:,x,h
-    LONG=experiment:,etype:,compflags:,progflags:,runflags:,nodes:,protocols:,maldishonest,codishonest,semidishonest,malhonest,semihonest,field,ring,binary,all,input:,measureram,cpu:,cpuquota:,freq:,ram:,swap:,config:,latency:,bandwidth:,packetdrop:,help
+    SHORT=n:,h
+    LONG=nodes:,help:
 
     PARSED=$(getopt --options ${SHORT} \
                     --longoptions ${LONG} \
@@ -143,26 +143,9 @@ setParameters() {
         case "$1" in
             -h|--help)
                 help;;
-            -e|--experiment)
-                EXPERIMENT="$2"
-                shift;;
-            --etype)
-                ETYPE="$2"
-                shift;;
-            --compflags)
-                compflags="$2"
-                shift;;
-            --progflags)
-                progflags="$2"
-                shift;;
-            --runflags)
-                runflags="$2"
-                shift;;
             -n|--nodes) 
                 setArray NODES "$2"
                 shift;;
-            -x)
-                CONFIGRUN=true;;
             *) error $LINENO "${FUNCNAME[0]}(): unrecognized flag $1 $2";;
         esac
         shift || true      # skip to next option-argument pair
