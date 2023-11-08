@@ -43,7 +43,7 @@ apt install -y automake build-essential cmake git libboost-dev libboost-thread-d
 pip3 install -U numpy
 checkConnection "github.com"
 echo 'deb http://deb.debian.org/debian testing main' > /etc/apt/sources.list.d/testing.list
-bash -c "($wget -O - https://apt.llvm.org/llvm.sh)"
+bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
 apt update -y
 apt install -y gcc-12 g++-12
 apt install -y clang-16 clang++-16
