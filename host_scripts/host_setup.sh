@@ -10,8 +10,7 @@ set -x
 
 echo "Test" >> hostconfig
 pos_upload hostconfig
-REPO=$(pos_get_variable repo --from-global)
-REPO_COMMIT=$(pos_get_variable repo_commit --from-global)       
+REPO=$(pos_get_variable repo --from-global)     
 REPO_DIR=$(pos_get_variable repo_dir --from-global)
 REPO2=$(pos_get_variable repo2 --from-global)
 REPO2_DIR=$(pos_get_variable repo2_dir --from-global)
@@ -48,7 +47,7 @@ apt install -y gcc-12 g++-12
 apt install -y clang-16 clang++-16
 git clone "$REPO" "$REPO_DIR"
 git clone "$REPO2" "$REPO2_DIR"
-
+echo "cloned"
 # load custom htop config
 mkdir -p .config/htop
 cp "$REPO2_DIR"/helpers/htoprc ~/.config/htop/

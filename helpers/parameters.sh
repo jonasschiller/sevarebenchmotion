@@ -151,7 +151,6 @@ setParameters() {
         esac
         shift || true      # skip to next option-argument pair
     done
-    echo "${NODES[0]}"
      # node already in use check
     nodetasks=$(pgrep -facu "$(id -u)" "${NODES[0]}")
     [ "$nodetasks" -gt 10 ] && error $LINENO "${FUNCNAME[0]}(): it appears host ${NODES[0]} is currently in use"
