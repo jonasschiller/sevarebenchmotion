@@ -125,7 +125,6 @@ setParameters() {
     getopt --test > /dev/null
     [ $? -ne 4 ] && { error $LINENO "${FUNCNAME[0]}(): getopt not available 
         for parsing arguments."; }
-    echo "getopt"
     # define the flags for the parameters
     # ':' means that the flag expects an argument.
     SHORT=n:,h
@@ -137,7 +136,6 @@ setParameters() {
                     -- "$@") || { error $LINENO "${FUNCNAME[0]}(): getopt failed parsing options"; }
 
     set -- "${PARSED}"
-    echo "parsing"
     while [ $# -gt 1 ]; do
         #echo "parsing arg: $1 $2"
         case "$1" in
@@ -150,10 +148,9 @@ setParameters() {
         esac
         shift || true      # skip to next option-argument pair
     done
-    echo "parsed"
+    echo ${NODES[0]}
      # node already in use check
      # node already in use check
     nodetasks=$(pgrep -facu "$(id -u)" "${NODES[0]}")
     [ "$nodetasks" -gt 10 ] && error $LINENO "${FUNCNAME[0]}(): it appears host ${NODES[0]} is currently in use"
-    echo "Final"
 }
