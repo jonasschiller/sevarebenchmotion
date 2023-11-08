@@ -8,7 +8,8 @@ set -e
 # log every command
 set -x                         
 
-echo "Test" >> hostconfig.file
+echo "Test" >> hostconfig
+pos_upload hostconfig
 REPO=$(pos_get_variable repo --from-global)
 REPO_COMMIT=$(pos_get_variable repo_commit --from-global)       
 REPO_DIR=$(pos_get_variable repo_dir --from-global)
