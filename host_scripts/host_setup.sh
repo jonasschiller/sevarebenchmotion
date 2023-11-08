@@ -30,7 +30,6 @@ checkConnection() {
     done
     $success
 }
-pos_upload pinglog_external
 echo "Test" >> hostconfig.file
 checkConnection "mirror.lrz.de"
 apt update
@@ -47,7 +46,8 @@ apt install -y gcc-12 g++-12
 apt install -y clang-16 clang++-16
 git clone "$REPO" "$REPO_DIR"
 git clone "$REPO2" "$REPO2_DIR"
-echo "cloned"
+version = gcc-12 --version
+echo "$version" >> hostconfig.file
 # load custom htop config
 mkdir -p .config/htop
 cp "$REPO2_DIR"/helpers/htoprc ~/.config/htop/
