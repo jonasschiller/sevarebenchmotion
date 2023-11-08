@@ -8,7 +8,7 @@ set -e
 # log every command
 set -x                         
 
-echo "Test"
+echo "Test" >> hostconfig.file
 REPO=$(pos_get_variable repo --from-global)
 REPO_COMMIT=$(pos_get_variable repo_commit --from-global)       
 REPO_DIR=$(pos_get_variable repo_dir --from-global)
@@ -30,7 +30,7 @@ checkConnection() {
     done
     $success
 }
-echo "Test"
+echo "Test" >> hostconfig.file
 checkConnection "mirror.lrz.de"
 apt update
 apt install -y automake build-essential cmake git libboost-dev libboost-thread-dev \
@@ -50,7 +50,7 @@ git clone "$REPO2" "$REPO2_DIR"
 # load custom htop config
 mkdir -p .config/htop
 cp "$REPO2_DIR"/helpers/htoprc ~/.config/htop/
-echo "test"
+echo "Test" >> hostconfig.file
 cd "$REPO_DIR"
 cd cmake
 sed -i 's/boost_1_76_0.tar.bz2/boost_1_83_0.tar.bz2/g' BuildBoostLocally.cmake
@@ -61,4 +61,5 @@ cd build
 cmake ..
 make -j 4
 
-echo "global setup successful " 
+echo "global setup successful " >> hostconfig.file
+pos_upload hostconfig.file /usr/jschille/upload
