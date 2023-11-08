@@ -148,7 +148,7 @@ setParameters() {
         esac
         shift || true      # skip to next option-argument pair
     done
-    echo ${NODES[0]}
+    echo "${NODES[0]}"
      # node already in use check
      # node already in use check
     nodetasks=$(pgrep -facu "$(id -u)" "${NODES[0]}")
