@@ -31,6 +31,7 @@ checkConnection() {
     done
     $success
 }
+pos_upload pinglog_external
 echo "Test" >> hostconfig.file
 checkConnection "mirror.lrz.de"
 apt update
