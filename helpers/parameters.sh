@@ -128,14 +128,14 @@ setParameters() {
     # define the flags for the parameters
     # ':' means that the flag expects an argument.
     SHORT=n:,h
-    LONG=nodes:,help:
+    LONG=nodes:,help
 
     PARSED=$(getopt --options ${SHORT} \
                     --longoptions ${LONG} \
                     --name "$0" \
                     -- "$@") || { error $LINENO "${FUNCNAME[0]}(): getopt failed parsing options"; }
 
-    set -- "${PARSED}"
+    eval set -- "${PARSED}"
     while [ $# -gt 1 ]; do
         #echo "parsing arg: $1 $2"
         case "$1" in
@@ -143,7 +143,7 @@ setParameters() {
                 help;;
             -n|--nodes) 
                 setArray NODES "$2"
-                echo "Nodes set"
+                echo "Nodes"
                 shift;;
 
             *) error $LINENO "${FUNCNAME[0]}(): unrecognized flag $1 $2";;
