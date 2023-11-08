@@ -55,7 +55,9 @@ fi
 
 # Set the priority for GCC-12 (adjust the path as needed)
 GCC_PATH="/usr/bin/gcc-12"
+GPP_PATH="/usr/bin/g++-12"
 GCC_PRIORITY=100
+GPP_PRIORITY=100
 
 # Check if GCC-12 exists
 if [ ! -f "$GCC_PATH" ]; then
@@ -63,16 +65,26 @@ if [ ! -f "$GCC_PATH" ]; then
     exit 1
 fi
 
+# Check if G++-12 exists
+if [ ! -f "$GPP_PATH" ]; then
+    echo "g++-12 not found at $GPP_PATH. Please make sure it is installed."
+    exit 1
+fi
+
 # Register GCC-12 as an alternative to the default GCC
 update-alternatives --install /usr/bin/gcc gcc "$GCC_PATH" "$GCC_PRIORITY"
 
+# Register G++-12 as an alternative to the default C++
+update-alternatives --install /usr/bin/g++ g++ "$GPP_PATH" "$GPP_PRIORITY"
 # Select GCC-12 as the default
 update-alternatives --set gcc "$GCC_PATH"
+# Select G++-12 as the default
+update-alternatives --set g++ "$GPP_PATH"
 
 # Display the current default version
 echo "GCC-12 is now the default GCC version."
 gcc --version
-
+g++ --version
 echo "$(gcc --version)" >> hostconfig
 # load custom htop config
 mkdir -p .config/htop
