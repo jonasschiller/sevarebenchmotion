@@ -75,6 +75,9 @@ setArray() { # load array $1 reference with ,-seperated values in $2
     local -n array="$1"     # get array reference
     set -f                  # avoid * expansion
     IFS="," read -r -a array <<< "$2"
+    for element in "${array[@]}"; do
+        echo "$element"
+    done
 }
 
 TEMPFILES=()
@@ -143,14 +146,12 @@ setParameters() {
                 help;;
             -n|--nodes) 
                 setArray NODES "$2"
-                echo "Nodes"
                 shift;;
-
             *) error $LINENO "${FUNCNAME[0]}(): unrecognized flag $1 $2";;
         esac
         shift || true      # skip to next option-argument pair
     done
-    echo "Test"
+    echo "${NODES[0]}"
      # node already in use check
     nodetasks=$(pgrep -facu "$(id -u)" "${NODES[0]}")
     [ "$nodetasks" -gt 10 ] && error $LINENO "${FUNCNAME[0]}(): it appears host ${NODES[0]} is currently in use"
