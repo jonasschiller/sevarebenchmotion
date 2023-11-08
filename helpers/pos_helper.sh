@@ -12,6 +12,7 @@ initializePOS() {
 	# allocate all NODES at once and store alloc id
 	# sed shifts output lines by four blanks for pretty formating
 	echo "  allocating host(s) ${NODES[*]}"
+	echo $NODES
 	{ ALLOC_ID=$("$POS" allocations allocate "${NODES[@]}" | sed 's/^/    /'); } ||
 		error ${LINENO} "${FUNCNAME[0]} allocations allocate failed"
 	echo "$ALLOC_ID"
@@ -60,7 +61,7 @@ runExperiment() {
 	
 	echo "  running experiment on host(s) ${NODES[*]}"
 	player=0
-	path=/root/sevarebench/host_scripts
+	path=/root/sevarebenchmotion/host_scripts
 	script="$path"/measurement.sh
 	cdomain=$1
 	declare -n cdProtocols="${cdomain}PROTOCOLS"
