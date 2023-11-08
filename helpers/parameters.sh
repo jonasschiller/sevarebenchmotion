@@ -143,7 +143,9 @@ setParameters() {
                 help;;
             -n|--nodes) 
                 setArray NODES "$2"
+                echo "Nodes set"
                 shift;;
+
             *) error $LINENO "${FUNCNAME[0]}(): unrecognized flag $1 $2";;
         esac
         shift || true      # skip to next option-argument pair
