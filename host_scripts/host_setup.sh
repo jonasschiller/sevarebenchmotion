@@ -49,8 +49,8 @@ apt update -y
 apt install -y gcc-12 g++-12
 git clone "$REPO" "$REPO_DIR"
 git clone "$REPO2" "$REPO2_DIR"
-version = gcc-12 --version
-echo "$version" >> hostconfig.file
+gcc-12 --version
+echo "$(gcc --version)" >> hostconfig.file
 # load custom htop config
 mkdir -p .config/htop
 cp "$REPO2_DIR"/helpers/htoprc ~/.config/htop/
