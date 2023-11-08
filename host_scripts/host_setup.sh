@@ -49,8 +49,33 @@ apt update -y
 apt install -y gcc-12 g++-12
 git clone "$REPO" "$REPO_DIR"
 git clone "$REPO2" "$REPO2_DIR"
-gcc-12 --version
+if ! command -v update-alternatives &> /dev/null; then
+    echo "update-alternatives command not found. This script is intended for Debian/Ubuntu-based systems."
+    exit 1
+fi
+
+# Set the priority for GCC-12 (adjust the path as needed)
+GCC_PATH="/usr/bin/gcc-12"
+GCC_PRIORITY=100
+
+# Check if GCC-12 exists
+if [ ! -f "$GCC_PATH" ]; then
+    echo "GCC-12 not found at $GCC_PATH. Please make sure it is installed."
+    exit 1
+fi
+
+# Register GCC-12 as an alternative to the default GCC
+update-alternatives --install /usr/bin/gcc gcc "$GCC_PATH" "$GCC_PRIORITY"
+
+# Select GCC-12 as the default
+update-alternatives --set gcc "$GCC_PATH"
+
+# Display the current default version
+echo "GCC-12 is now the default GCC version."
+gcc --version
+
 echo "$(gcc --version)" >> hostconfig.file
+pos_upload hostconfig.file
 # load custom htop config
 mkdir -p .config/htop
 cp "$REPO2_DIR"/helpers/htoprc ~/.config/htop/
