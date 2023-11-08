@@ -39,7 +39,8 @@ echo "Test" >> hostconfig.file
 apt update
 apt install -y automake build-essential cmake git libboost-dev libboost-thread-dev \
     libntl-dev libsodium-dev libssl-dev libtool m4 python3 texinfo yasm linux-cpupower \
-    python3-pip time parted libomp-dev htop
+    python3-pip time parted libomp-dev htop wget gnupg software-properties-common \
+    lsb-release 
 pip3 install -U numpy
 checkConnection "github.com"
 echo 'deb http://deb.debian.org/debian testing main' > /etc/apt/sources.list.d/testing.list
@@ -66,4 +67,4 @@ cmake ..
 make -j 4
 
 echo "global setup successful " >> hostconfig.file
-pos_upload hostconfig.file /usr/jschille/upload
+pos_upload hostconfig.file
