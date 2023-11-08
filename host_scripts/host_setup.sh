@@ -47,7 +47,6 @@ echo 'deb http://deb.debian.org/debian testing main' > /etc/apt/sources.list.d/t
 bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
 apt update -y
 apt install -y gcc-12 g++-12
-apt install -y clang++-17
 git clone "$REPO" "$REPO_DIR"
 git clone "$REPO2" "$REPO2_DIR"
 version = gcc-12 --version
