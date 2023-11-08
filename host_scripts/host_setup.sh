@@ -58,6 +58,7 @@ echo "Test" >> hostconfig.file
 cd "$REPO_DIR"
 cd cmake
 sed -i 's/boost_1_76_0/boost_1_83_0/g' BuildBoostLocally.cmake
+sed -i 's/1.76.0/1.83.0/g' BuildBoostLocally.cmake
 sed -i 's/f0397ba6e982c4450f27bf32a2a83292aba035b827a5623a14636ea583318c41/6478edfe2f3305127cffe8caf73ea0176c53769f4bf1585be237eb30798c3b8e/g' BuildBoostLocally.cmake
 cd ..
 mkdir build
