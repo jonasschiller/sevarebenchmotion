@@ -30,8 +30,12 @@ checkConnection() {
     done
     $success
 }
-echo "Test" >> hostconfig.file
+
+
 checkConnection "mirror.lrz.de"
+echo 'unattended-upgrades unattended-upgrades/enable_auto_updates boolean false' | debconf-set-selections
+export DEBIAN_FRONTEND=noninteractive
+echo "Test" >> hostconfig.file
 apt update
 apt install -y automake build-essential cmake git libboost-dev libboost-thread-dev \
     libntl-dev libsodium-dev libssl-dev libtool m4 python3 texinfo yasm linux-cpupower \
