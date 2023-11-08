@@ -35,7 +35,6 @@ checkConnection() {
 checkConnection "mirror.lrz.de"
 echo 'unattended-upgrades unattended-upgrades/enable_auto_updates boolean false' | debconf-set-selections
 export DEBIAN_FRONTEND=noninteractive
-echo "Test" >> hostconfig.file
 apt update
 apt install -y automake build-essential cmake git libboost-dev libboost-thread-dev \
     libntl-dev libsodium-dev libssl-dev libtool m4 python3 texinfo yasm linux-cpupower \
@@ -74,8 +73,7 @@ update-alternatives --set gcc "$GCC_PATH"
 echo "GCC-12 is now the default GCC version."
 gcc --version
 
-echo "$(gcc --version)" >> hostconfig.file
-pos_upload hostconfig.file
+echo "$(gcc --version)" >> hostconfig
 # load custom htop config
 mkdir -p .config/htop
 cp "$REPO2_DIR"/helpers/htoprc ~/.config/htop/
@@ -91,5 +89,5 @@ cd build
 cmake ..
 make -j 4
 
-echo "global setup successful " >> hostconfig.file
-pos_upload hostconfig.file
+echo "global setup successful " >> hostconfig
+pos_upload hostconfig
