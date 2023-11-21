@@ -12,7 +12,7 @@ set -x
 
 REPO_DIR=$(pos_get_variable repo_dir --from-global)
 REPO2_DIR=$(pos_get_variable repo2_dir --from-global)
-source "$REPO2_DIR"/protocols.sh
+source "$REPO2_DIR"/build/bin/crosstables
 EXPERIMENT=$(pos_get_variable experiment --from-global)
 runflags=$(pos_get_variable runflags --from-global)
 [ "$runflags" == None ] && runflags=""
@@ -31,33 +31,11 @@ etype=$7
 # default to etype 1 if unset
 etype=${etype:-1}
 
-cd "$REPO_DIR"
+cd "$REPO_DIR"/build/bin
 
 {
-    echo "player: $player, cdomain: $cdomain, protocols: ${protocols[*]}, types: ${types[*]}"
-
-    # experiment specific part: generate random input
-    echo "create $partysize random set of size: $size"
-    bash "$REPO2_DIR"/experiments/"$EXPERIMENT"/generatepinput.sh "$size" "$partysize" "$etype"
-
-    # MP-SPDZ specific part: compile experiment
-    # only compile if not already compiled
-    binarypath="Programs/Bytecode/experiment-$size-$partysize-$etype-0.bc"
-    if [ ! -f "$binarypath" ]; then
-        case "$cdomain" in
-            RING) 
-                /bin/time -f "$timerf" ./compile.py -R 64 experiment "$size" "$partysize" "$etype";;
-            BINARY) 
-                /bin/time -f "$timerf" ./compile.py -B 64 experiment "$size" "$partysize" "$etype";;
-            *) # default to FIELD
-                /bin/time -f "$timerf" ./compile.py experiment "$size" "$partysize" "$etype";;
-        esac
-        echo "$(du -BM "$binarypath" | cut -d 'M' -f 1) (Binary file size in MiB)"
-    fi
-
-    # unconcealed verification run
-    "$REPO2_DIR"/experiments/"$EXPERIMENT"/experiment.py "$etype"
-} |& tee measurementlog"$cdomain"
+    /bin/time -f "$timerf" ./crosstabs "--my-id $player --parties $player"
+} |& tee measurementlogmotion
 
 ####
 #  environment manipulation section start

@@ -9,7 +9,6 @@ set -e
 set -x                         
 
 echo "Test" >> hostconfig
-pos_upload hostconfig
 REPO=$(pos_get_variable repo --from-global)     
 REPO_DIR=$(pos_get_variable repo_dir --from-global)
 REPO2=$(pos_get_variable repo2 --from-global)
@@ -92,14 +91,16 @@ cp "$REPO2_DIR"/helpers/htoprc ~/.config/htop/
 echo "Test" >> hostconfig.file
 cd "$REPO_DIR"
 cd cmake
-sed -i 's/boost_1_76_0/boost_1_83_0/g' BuildBoostLocally.cmake
-sed -i 's/1.76.0/1.83.0/g' BuildBoostLocally.cmake
-sed -i 's/f0397ba6e982c4450f27bf32a2a83292aba035b827a5623a14636ea583318c41/6478edfe2f3305127cffe8caf73ea0176c53769f4bf1585be237eb30798c3b8e/g' BuildBoostLocally.cmake
+sed -i 's/boost_1_76_0/boost_1_75_0/g' BuildBoostLocally.cmake
+sed -i 's/1.76.0/1.75.0/g' BuildBoostLocally.cmake
+sed -i 's/f0397ba6e982c4450f27bf32a2a83292aba035b827a5623a14636ea583318c41/953db31e016db7bb207f11432bef7df100516eeb746843fa0486a222e3fd49cb/g' BuildBoostLocally.cmake
 cd ..
 mkdir build
 cd build
 cmake ..
-make -j 4
+make -j 4 all
+make install
+
 
 echo "global setup successful " >> hostconfig
 pos_upload hostconfig

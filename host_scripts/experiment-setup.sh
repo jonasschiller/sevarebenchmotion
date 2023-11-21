@@ -180,20 +180,6 @@ pos_upload speedtest
 #### compile libaries and prepare experiments
 #######
 
-
-# handle yao's -O protocol Variant
-protocols="${protocols//yaoO/yao}"
-
-cp "$REPO2_DIR"/experiments/"$EXPERIMENT"/experiment.mpc \
-	"$REPO_DIR"/Programs/Source/
-chmod +x "$REPO2_DIR"/helpers/* "$REPO2_DIR"/experiments/"$EXPERIMENT"/*
-cd "$REPO_DIR"
-
-tar -xf "$REPO2_DIR"/helpers/SSLcerts.tar
-
-# activate BMR MultiParty
-sed -i 's/#define MAX_N_PARTIES 3/\/\/#define MAX_N_PARTIES 3/' BMR/config.h
-
 # add custom compile flags
 compflags=$(pos_get_variable compflags --from-global)
 
