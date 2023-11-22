@@ -8,5 +8,3 @@ set -x
 REPO_DIR=$(pos_get_variable repo_dir --from-global)
 
 cd "$REPO_DIR"
-
-rm -rf Programs/Bytecode/*

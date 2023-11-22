@@ -11,43 +11,35 @@ verifyExperiment() {
     # move to resultpath location
     while IFS= read -r file; do
         mv "$file" "$resultpath"
-    done < <(find "$RPATH/${NODES[1]}/" -name "testresultsBINARYyaoO*" -print)
+    i=0
+    loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
+    # while we find a next loop info file do
+    while [ -n "$loopinfo" ]; do
 
-    for cdomain in "${CDOMAINS[@]}"; do
-        declare -n cdProtocols="${cdomain}PROTOCOLS"
-        for protocol in "${cdProtocols[@]}"; do
-            protocol=${protocol::-8}
-            
-            i=0
-            loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
-            # while we find a next loop info file do
-            while [ -n "$loopinfo" ]; do
+        # get pos filepath of the measurements for the current loop
+        experimentresult=$(find "$resultpath" -name "testresults$cdomain${protocol}_run*$i" -print -quit)
+        verificationresult=$(find "$resultpath" -name "measurementlog${cdomain}_run*$i" -print -quit)
 
-                # get pos filepath of the measurements for the current loop
-                experimentresult=$(find "$resultpath" -name "testresults$cdomain${protocol}_run*$i" -print -quit)
-                verificationresult=$(find "$resultpath" -name "measurementlog${cdomain}_run*$i" -print -quit)
+        # check existance of files
+        if [ ! -f "$experimentresult" ] || [ ! -f "$verificationresult" ]; then
+            styleOrange "  Skip $protocol - File not found error: $experimentresult"
+            continue 2
+        fi
 
-                # check existance of files
-                if [ ! -f "$experimentresult" ] || [ ! -f "$verificationresult" ]; then
-                    styleOrange "  Skip $protocol - File not found error: $experimentresult"
-                    continue 2
-                fi
-
-                # verify experiment result - call experiment specific verify script
-                chmod +x experiments/"$EXPERIMENT"/verify.py
-                match=$(experiments/"$EXPERIMENT"/verify.py "$experimentresult" "$verificationresult")
-                if [ "$match" != 1 ]; then
-                    styleOrange "  Skip $protocol - $match at $experimentresult";
-                    continue 2;
-                fi
-                ((++i))
-                loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
-            done
-
-            # only pass if while-loop actually entered
-            [ "$i" -gt 0 ] && okfail ok "  verified - test passed for $protocol"
-        done
+        # verify experiment result - call experiment specific verify script
+        chmod +x experiments/"$EXPERIMENT"/verify.py
+        match=$(experiments/"$EXPERIMENT"/verify.py "$experimentresult" "$verificationresult")
+        if [ "$match" != 1 ]; then
+            styleOrange "  Skip $protocol - $match at $experimentresult";
+            continue 2;
+        fi
+        ((++i))
+        loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
     done
+
+    # only pass if while-loop actually entered
+    [ "$i" -gt 0 ] && okfail ok "  verified - test passed 
+        
 }
 
 ############

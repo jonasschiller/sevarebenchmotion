@@ -35,3 +35,23 @@ for pid in "${PIDS[@]}"; do
 done
 
 echo "host setup complete"
+
+
+RUNSTATUS="${Orange}incomplete${Stop}"
+
+source helpers/testresults_helper.sh
+
+echo "running experiment on hosts..."
+PIDS=()
+runExperiment 
+
+sleep 2 && echo " ...waiting for experiment"
+for pid in "${PIDS[@]}"; do
+    # and error on the testnodes can be caught here
+    wait "$pid" || getlastoutput
+done
+echo "  done with experiment"
+
+done
+
+RUNSTATUS="${Green}completed${Stop}"

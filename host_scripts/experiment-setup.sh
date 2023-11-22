@@ -11,11 +11,10 @@ REPO_DIR=$(pos_get_variable repo_dir --from-global)
 REPO2_DIR=$(pos_get_variable repo2_dir --from-global)
 EXPERIMENT=$(pos_get_variable experiment --from-global)
 # SMC protocols to compile
-protocols="$1"
-ipaddr="$2"
-SWAP="$3"
-network="$4"
-read -r -a nodes <<< "$5"
+ipaddr="$1"
+SWAP="$2"
+network="$3"
+read -r -a nodes <<< "$4"
 groupsize=${#nodes[*]}
 
 
@@ -176,44 +175,11 @@ stopserver
 pos_upload speedtest
 
 
-#######
-#### compile libaries and prepare experiments
-#######
-
-# add custom compile flags
-compflags=$(pos_get_variable compflags --from-global)
-
-if [ "$compflags" != None ]; then
-	if [ -f CONFIG.mine ]; then
-		sed -i "/^MY_CFLAGS/ s/$/ $compflags/" CONFIG.mine
-	else
-		echo "MY_CFLAGS += $compflags" >> CONFIG.mine
-	fi
-fi
-
 # determine the number of jobs for compiling via available ram and cpu cores
 maxcoresram=$(($(grep "MemTotal" /proc/meminfo | awk '{print $2}')/(1024*2500)))
 maxcorescpu=$(($(nproc --all)-1))
 # take the minimum of the two options
 maxjobs=$(( maxcoresram < maxcorescpu ? maxcoresram : maxcorescpu ))
-
-# get required packages
-make -j "$maxjobs" mpir linux-machine-setup &> makelog
-
-# compiling fails randomly, need to repeat a few times
-i=0
-maxtry=5
-success=false
-while [ $i -lt $maxtry ] && ! $success; do
-	success=true
-	echo "____try $i" >> makelog
-	make -j "$maxjobs" $protocols &>> makelog || success=false
-	((++i))
-	sleep 1
-done
-
-# abort if no success
-$success
 
 # set up swap disk for RAM pageswapping measurements
 if [ -n "$SWAP" ] && [ -b /dev/nvme0n1 ]; then

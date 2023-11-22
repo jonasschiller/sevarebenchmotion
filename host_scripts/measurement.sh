@@ -10,32 +10,22 @@ set -e
 # log every command
 set -x
 
+#Get motion directory
 REPO_DIR=$(pos_get_variable repo_dir --from-global)
+#Get sevarebench directory
 REPO2_DIR=$(pos_get_variable repo2_dir --from-global)
-source "$REPO2_DIR"/build/bin/crosstables
-EXPERIMENT=$(pos_get_variable experiment --from-global)
-runflags=$(pos_get_variable runflags --from-global)
-[ "$runflags" == None ] && runflags=""
-size=$(pos_get_variable input_size --from-loop)
+#Set up measurement and define what to measure and output format
 timerf="%M (Maximum resident set size in kbytes)\n%e (Elapsed wall clock time in seconds)\n%P (Percent of CPU this job got)"
+#Get player id
 player=$1
-cdomain=$2
-environ=""
-read -r -a protocols <<< "$3"
 # test types to simulate changing environments like cpu frequency or network latency
-read -r -a types <<< "$4"
-network="$5"
-partysize=$6
-# experiment type to allow small differences in experiments
-etype=$7
+read -r -a types <<< "$2"
+network="$3"
+partysize=$4
 # default to etype 1 if unset
 etype=${etype:-1}
 
 cd "$REPO_DIR"/build/bin
-
-{
-    /bin/time -f "$timerf" ./crosstabs "--my-id $player --parties $player"
-} |& tee measurementlogmotion
 
 ####
 #  environment manipulation section start
@@ -76,50 +66,33 @@ esac
 #  environment manipulation section stop
 ####
 
-for protocol in "${protocols[@]}"; do
 
-    log=testresults"$cdomain""${protocol::-8}"
-    touch "$log"
 
-    success=true
+log=testresultsFirstRun
+touch "$log"
 
-    pos_sync --timeout 300
+success=true
 
-    # Some protocols are only for 2,3 or 4 parties
-    # they imply the flag -N so it's not allowed
-    extraflag="-N $partysize"
-    # need to skip for some nodes
-    skip=false
-    if [[ " ${N4Protocols[*]} " == *" ${protocol::-8} "* ]]; then
-        extraflag=""
-        [ "$player" -lt 4 ] || skip=true
-    elif [[ " ${N3Protocols[*]} " == *" ${protocol::-8} "* ]]; then
-        extraflag=""
-        [ "$player" -lt 3 ] || skip=true
-    elif [[ " ${N2Protocols[*]} " == *" ${protocol::-8} "* ]]; then
-        extraflag=""
-        [ "$player" -lt 2 ] || skip=true
-        # yao's -O protocol variant
-        if [ "${protocol::-8}" == yaoO ]; then
-            protocol=yao-party.x
-            extraflag="-O"
-        fi
-        runflags="${runflags//-u/}"
-    fi
+pos_sync --timeout 300
 
-    # run the SMC protocol
-    $skip ||
-        /bin/time -f "$timerf" ./"$protocol" $runflags -h 10.10."$network".2 $extraflag -p "$player" \
-            experiment-"$size"-"$partysize"-"$etype" &> "$log" || success=false
-
-    pos_upload --loop "$log"
-
-    #abort if no success
-    $success
-
-    pos_sync
-
+#Build a String of the IP Adresses of the parties
+ips=""
+for i in $(seq 2 $((partysize+1))); do
+    ips+="10.10.$network.$i "
 done
+
+# run the SMC protocol
+$skip ||
+    /bin/time -f "$timerf" ./"crosstabs" --my-id $player --players $ips --input 1 3 5 6 &> "$log" || success=false
+
+pos_upload --loop "$log"
+
+#abort if no success
+$success
+
+pos_sync
+
+
 
 ####
 #  environment manipulation reset section start
@@ -141,16 +114,9 @@ esac
 #  environment manipulation reset section stop
 ####
 
-# if there are no test types
-if [ "${#types[*]}" -lt 1 ]; then
-    # older binaries won't be needed anymore and can be removed
-    # this is important for a big number of various input sizes
-    # as with many binaries a limited disk space gets consumed fast
-    rm -rf Programs/Bytecode/*
-fi
 
 pos_sync --loop
 
-echo "experiment successful"  >> measurementlog"$cdomain"
+echo "experiment successful"  >> measurementlog
 
-pos_upload --loop measurementlog"$cdomain"
+pos_upload --loop measurementlog

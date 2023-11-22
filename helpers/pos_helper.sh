@@ -51,6 +51,10 @@ setupExperiment() {
 	for node in "${NODES[@]}"; do
 		{ "$POS" comm laun --infile host_scripts/host_setup.sh --blocking "$node";
 		echo "      $node host setup successfull";
+		echo "    running experiment setup of $node";
+		"$POS" comm laun --blocking "$node" -- \
+			/bin/bash "$path"experiment-setup.sh  "$ipaddr" "$SWAP" "$NETWORK" "${NODES[*]}";
+		echo "      $node experiment setup successfull"; 
 		} &
 		PIDS+=( $! )
 		((++ipaddr))
@@ -61,17 +65,17 @@ runExperiment() {
 	
 	echo "  running experiment on host(s) ${NODES[*]}"
 	player=0
+	ipaddr=2
 	path=/root/sevarebenchmotion/host_scripts
 	script="$path"/measurement.sh
-	cdomain=$1
-	declare -n cdProtocols="${cdomain}PROTOCOLS"
 		
 	for node in "${NODES[@]}"; do
 		echo "    execute experiment on host $node..."
 		# the reset removes the compiled binaries, to make place for the next comp domain
+		# send all ip addresses so it can be formated into the motion style execution
 		{ 	"$POS" comm laun --blocking "$node" -- /bin/bash "$path"/experiment-reset.sh;
 			"$POS" comm laun --blocking --loop "$node" -- \
-				/bin/bash "$script" "$player" "$cdomain" "${cdProtocols[*]}" "${TTYPES[*]}" "$NETWORK" "${#NODES[*]}" "$ETYPE";
+				/bin/bash "$script" "$player" "${TTYPES[*]}" "$NETWORK" "${#NODES[*]}";
 		} &
 		PIDS+=( $! )
 		((++player))
