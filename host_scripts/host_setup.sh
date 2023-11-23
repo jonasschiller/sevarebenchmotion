@@ -79,8 +79,7 @@ update-alternatives --install /usr/bin/g++ g++ "$GPP_PATH" "$GPP_PRIORITY"
 update-alternatives --set gcc "$GCC_PATH"
 # Select G++-12 as the default
 update-alternatives --set g++ "$GPP_PATH"
-echo "GCC-12 is now the default GCC version." >> test
-pos_upload test
+
 # Display the current default version
 echo "GCC-12 is now the default GCC version."
 gcc --version
@@ -89,17 +88,11 @@ echo "$(gcc --version)" >> hostconfig
 # load custom htop config
 mkdir -p .config/htop
 cp "$REPO2_DIR"/helpers/htoprc ~/.config/htop/
-echo "Test" >> hostconfig.file
 cd "$REPO_DIR"
-cd cmake
-sed -i 's/boost_1_76_0/boost_1_75_0/g' BuildBoostLocally.cmake
-sed -i 's/1.76.0/1.75.0/g' BuildBoostLocally.cmake
-sed -i 's/f0397ba6e982c4450f27bf32a2a83292aba035b827a5623a14636ea583318c41/953db31e016db7bb207f11432bef7df100516eeb746843fa0486a222e3fd49cb/g' BuildBoostLocally.cmake
-cd ..
 mkdir build
 cd build
 cmake ..
-make -j 4 all
+make all
 make install
 
 
