@@ -69,7 +69,7 @@ buildLibrary() {
 		{ 
 		echo "    Building Library on $node";
 		"$POS" comm laun --blocking "$node" -- \
-			/bin/bash "$path"librarybuild.sh;
+			/bin/bash "$path"buildlibrary.sh;
 					echo "      $node library build successfull"; 
 		} &
 		PIDS+=( $! )
