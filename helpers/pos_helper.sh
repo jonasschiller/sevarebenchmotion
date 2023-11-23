@@ -61,6 +61,21 @@ setupExperiment() {
 	done
 }
 
+buildLibrary() {
+
+	echo "  setting up host(s) ${NODES[*]}"
+	path=/root/sevarebenchmotion/host_scripts/
+	for node in "${NODES[@]}"; do
+		{ 
+		echo "    Building Library on $node";
+		"$POS" comm laun --blocking "$node" -- \
+			/bin/bash "$path"librarybuild.sh;
+					echo "      $node library build successfull"; 
+		} &
+		PIDS+=( $! )
+	done
+}
+
 runExperiment() {
 	
 	echo "  running experiment on host(s) ${NODES[*]}"
