@@ -1,9 +1,9 @@
-repo: https://github.com/encryptogroup/MOTION.git
+repo: https://github.com/jonasschiller/MOTION.git
 repo_dir: /root/MOTION
 repo2: https://github.com/jonasschiller/sevarebenchmotion.git
 # changing the repo_paths requires changing them in pos_helper.sh too
 repo2_dir: /root/sevarebench
-repoupload: git@github.com:vyrovcz/sevaremeasurements.git
+repoupload: git@github.com:jonasschiller/sevaremeasurements.git
 
 #######
 ## Networking environment definitions

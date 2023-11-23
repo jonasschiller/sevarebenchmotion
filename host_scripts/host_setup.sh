@@ -79,7 +79,8 @@ update-alternatives --install /usr/bin/g++ g++ "$GPP_PATH" "$GPP_PRIORITY"
 update-alternatives --set gcc "$GCC_PATH"
 # Select G++-12 as the default
 update-alternatives --set g++ "$GPP_PATH"
-
+echo "GCC-12 is now the default GCC version." >> test
+pos_upload test
 # Display the current default version
 echo "GCC-12 is now the default GCC version."
 gcc --version
