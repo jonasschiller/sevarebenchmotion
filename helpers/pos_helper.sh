@@ -43,22 +43,30 @@ initializePOS() {
 	done
 }
 
-setupExperiment() {
+setupHost() {
+	echo "  setting up host(s) ${NODES[*]}"
+	for node in "${NODES[@]}"; do
+		{ "$POS" comm laun --infile host_scripts/host_setup.sh --blocking "$node";
+		echo "      $node host setup successfull";
+		} &
+		PIDS+=( $! )
+	done
+}
 
+setupExperiment(){
 	echo "  setting up host(s) ${NODES[*]}"
 	ipaddr=2
 	path=/root/sevarebenchmotion/host_scripts/
 	for node in "${NODES[@]}"; do
-		{ "$POS" comm laun --infile host_scripts/host_setup.sh --blocking "$node";
-		echo "      $node host setup successfull";
-		echo "    running experiment setup of $node";
+		{ echo "    running experiment setup of $node";
 		"$POS" comm laun --blocking "$node" -- \
-			/bin/bash "$path"experiment-setup.sh  "$ipaddr" "$SWAP" "$NETWORK" "${NODES[*]}";
+			/bin/bash "$path"experiment-setup.sh "$ipaddr" "$SWAP" "$NETWORK" "${NODES[*]}";
 		echo "      $node experiment setup successfull"; 
 		} &
 		PIDS+=( $! )
 		((++ipaddr))
 	done
+	
 }
 
 buildLibrary() {

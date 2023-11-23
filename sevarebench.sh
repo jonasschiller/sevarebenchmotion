@@ -27,7 +27,7 @@ done
 
 echo "setting experiment hosts..."
 PIDS=()
-setupExperiment
+setupHost
 
 sleep 2 && echo " ...waiting for setup"
 for pid in "${PIDS[@]}"; do
@@ -36,7 +36,18 @@ done
 
 echo "host setup complete"
 
-echo "setting experiment hosts..."
+echo "setting experiment..."
+PIDS=()
+setupExperiment
+
+sleep 2 && echo " ...waiting for setup"
+for pid in "${PIDS[@]}"; do
+    wait "$pid"
+done
+
+echo "experiment setup complete"
+
+echo "build library on hosts."
 PIDS=()
 buildLibrary
 
