@@ -174,13 +174,6 @@ stopserver
 
 pos_upload speedtest
 
-
-# determine the number of jobs for compiling via available ram and cpu cores
-maxcoresram=$(($(grep "MemTotal" /proc/meminfo | awk '{print $2}')/(1024*2500)))
-maxcorescpu=$(($(nproc --all)-1))
-# take the minimum of the two options
-maxjobs=$(( maxcoresram < maxcorescpu ? maxcoresram : maxcorescpu ))
-
 # set up swap disk for RAM pageswapping measurements
 if [ -n "$SWAP" ] && [ -b /dev/nvme0n1 ]; then
 	echo "creating swapfile with swap size $SWAP"
