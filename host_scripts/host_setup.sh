@@ -91,8 +91,14 @@ cp "$REPO2_DIR"/helpers/htoprc ~/.config/htop/
 cd "$REPO_DIR"
 mkdir build
 cd build
-cmake ..
-make all
+cmake .. -DMOTION_BUILD_EXE=On
+
+# determine the number of jobs for compiling via available ram and cpu cores
+maxcoresram=$(($(grep "MemTotal" /proc/meminfo | awk '{print $2}')/(1024*2500)))
+maxcorescpu=$(($(nproc --all)-1))
+# take the minimum of the two options
+maxjobs=$(( maxcoresram < maxcorescpu ? maxcoresram : maxcorescpu ))
+make -j "$maxjobs" all
 make install
 
 
