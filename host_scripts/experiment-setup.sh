@@ -9,7 +9,6 @@ set -x
 
 REPO_DIR=$(pos_get_variable repo_dir --from-global)
 REPO2_DIR=$(pos_get_variable repo2_dir --from-global)
-EXPERIMENT=$(pos_get_variable experiment --from-global)
 # SMC protocols to compile
 ipaddr="$1"
 SWAP="$2"
