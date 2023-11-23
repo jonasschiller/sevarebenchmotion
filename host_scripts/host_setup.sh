@@ -92,7 +92,8 @@ cd "$REPO_DIR"
 mkdir build
 cd build
 cmake .. -DMOTION_BUILD_EXE=On
-
+echo "cmake successful" >> testconfig
+pos_upload testconfig
 # determine the number of jobs for compiling via available ram and cpu cores
 maxcoresram=$(($(grep "MemTotal" /proc/meminfo | awk '{print $2}')/(1024*2500)))
 maxcorescpu=$(($(nproc --all)-1))
