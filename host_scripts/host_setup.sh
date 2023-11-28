@@ -92,4 +92,4 @@ cd "$REPO_DIR"
 mkdir build
 cd build
 cmake .. -DMOTION_BUILD_EXE=On
-
+cd /root
