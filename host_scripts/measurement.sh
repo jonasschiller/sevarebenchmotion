@@ -85,7 +85,7 @@ done
 $skip ||
     /bin/time -f "$timerf" ./"crosstabs" --my-id $player --players $ips --input 1 3 5 6 &> "$log" || success=false
 
-pos_upload --loop "$log"
+pos_upload  "$log"
 
 #abort if no success
 $success
@@ -115,8 +115,8 @@ esac
 ####
 
 
-pos_sync --loop
+pos_sync
 
 echo "experiment successful"  >> measurementlog
 
-pos_upload --loop measurementlog
+pos_upload measurementlog
