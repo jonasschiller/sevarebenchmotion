@@ -34,17 +34,6 @@ for pid in "${PIDS[@]}"; do
     wait "$pid"
 done
 
-echo "host setup complete"
-
-echo "setting experiment..."
-PIDS=()
-setupExperiment
-
-sleep 2 && echo " ...waiting for setup"
-for pid in "${PIDS[@]}"; do
-    wait "$pid"
-done
-
 echo "experiment setup complete"
 
 
