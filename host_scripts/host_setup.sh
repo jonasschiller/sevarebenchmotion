@@ -8,7 +8,6 @@ set -e
 # log every command
 set -x                         
 
-echo "Test" >> hostconfig
 REPO=$(pos_get_variable repo --from-global)     
 REPO_DIR=$(pos_get_variable repo_dir --from-global)
 REPO2=$(pos_get_variable repo2 --from-global)
@@ -17,7 +16,7 @@ REPO2_DIR=$(pos_get_variable repo2_dir --from-global)
 # check WAN connection, waiting helps in most cases
 checkConnection() {
     address=$1
-    i=0
+    i=cd
     maxtry=5
     success=false
     while [ $i -lt $maxtry ] && ! $success; do
@@ -84,7 +83,7 @@ update-alternatives --set g++ "$GPP_PATH"
 echo "GCC-12 is now the default GCC version."
 gcc --version
 g++ --version
-echo "$(gcc --version)" >> hostconfig
+echo "$(gcc --version)"
 # load custom htop config
 mkdir -p .config/htop
 cp "$REPO2_DIR"/helpers/htoprc ~/.config/htop/
@@ -93,3 +92,5 @@ mkdir build
 cd build
 cmake .. -DMOTION_BUILD_EXE=On
 cd /root
+
+echo "global setup successful"
