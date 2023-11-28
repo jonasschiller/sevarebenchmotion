@@ -59,8 +59,7 @@ setupExperiment(){
 	path=/root/sevarebenchmotion/host_scripts/
 	for node in "${NODES[@]}"; do
 		{ echo "    running experiment setup of $node";
-		"$POS" comm laun --blocking "$node" -- \
-			/bin/bash "$path"experiment-setup.sh "$ipaddr" "$SWAP" "$NETWORK" "${NODES[*]}";
+		"$POS" comm laun --blocking "$node" -- /bin/bash "$path"experiment-setup.sh "$ipaddr" "$SWAP" "$NETWORK" "${NODES[*]}";
 		echo "      $node experiment setup successfull"; 
 		} &
 		PIDS+=( $! )

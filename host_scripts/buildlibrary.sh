@@ -8,7 +8,6 @@ set -e
 # log every command
 set -x                         
 
-echo "Test" >> librarybuildlog
 REPO=$(pos_get_variable repo --from-global)     
 REPO_DIR=$(pos_get_variable repo_dir --from-global)
 REPO2=$(pos_get_variable repo2 --from-global)
@@ -22,7 +21,3 @@ maxcorescpu=$(($(nproc --all)-1))
 maxjobs=$(( maxcoresram < maxcorescpu ? maxcoresram : maxcorescpu ))
 make -j "$maxjobs" all
 make install
-
-
-echo "global setup successful " >> librarybuildlog
-pos_upload librarybuildlog
