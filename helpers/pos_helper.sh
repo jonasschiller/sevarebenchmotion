@@ -75,8 +75,7 @@ buildLibrary() {
 	for node in "${NODES[@]}"; do
 		{ 
 		echo "    Building Library on $node";
-		"$POS" comm laun --blocking "$node" -- \
-			/bin/bash "$path"buildlibrary.sh;
+		"$POS" comm laun --infile host_sripts/buildlibrary.sh --blockibg "$node";
 					echo "      $node library build successfull"; 
 		} &
 		PIDS+=( $! )
