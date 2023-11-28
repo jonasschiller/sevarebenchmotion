@@ -83,7 +83,7 @@ done
 
 # run the SMC protocol
 $skip ||
-    /bin/time -f "$timerf" ./"benchmark-integers" --my-id $player --parties $ips --input 1 3 5 6 &> "$log" || success=false
+    /bin/time -f "$timerf" ./"benchmark-integers" --my-id $player --parties $ips &> "$log" || success=false
 
 pos_upload  "$log"
 
