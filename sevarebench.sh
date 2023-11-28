@@ -36,6 +36,17 @@ done
 
 echo "host setup complete"
 
+echo "build library on hosts."
+PIDS=()
+buildLibrary
+
+sleep 2 && echo " ...waiting for setup"
+for pid in "${PIDS[@]}"; do
+    wait "$pid"
+done
+
+echo "Library Build Complete"
+
 echo "setting experiment..."
 PIDS=()
 setupExperiment
@@ -47,16 +58,8 @@ done
 
 echo "experiment setup complete"
 
-echo "build library on hosts."
-PIDS=()
-buildLibrary
 
-sleep 2 && echo " ...waiting for setup"
-for pid in "${PIDS[@]}"; do
-    wait "$pid"
-done
 
-echo "Library Build Complete"
 
 
 RUNSTATUS="${Orange}incomplete${Stop}"
