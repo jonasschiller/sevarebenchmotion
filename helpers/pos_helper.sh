@@ -65,7 +65,6 @@ setupExperiment(){
 		PIDS+=( $! )
 		((++ipaddr))
 	done
-	
 }
 
 buildLibrary() {
@@ -75,7 +74,7 @@ buildLibrary() {
 	for node in "${NODES[@]}"; do
 		{ 
 		echo "    Building Library on $node";
-		"$POS" comm laun --infile host_sripts/buildlibrary.sh --blocking "$node";
+		"$POS" comm laun --infile host_scripts/buildlibrary.sh --blocking "$node";
 					echo "      $node library build successfull"; 
 		} &
 		PIDS+=( $! )
