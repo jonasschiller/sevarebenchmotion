@@ -16,7 +16,7 @@ REPO2_DIR=$(pos_get_variable repo2_dir --from-global)
 # check WAN connection, waiting helps in most cases
 checkConnection() {
     address=$1
-    i=cd
+    i=0
     maxtry=5
     success=false
     while [ $i -lt $maxtry ] && ! $success; do
