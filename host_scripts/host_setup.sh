@@ -46,6 +46,10 @@ apt update -y
 apt install -y gcc-12 g++-12
 git clone "$REPO" "$REPO_DIR"
 git clone "$REPO2" "$REPO2_DIR"
+
+echo ls
+echo "\n" 
+
 if ! command -v update-alternatives &> /dev/null; then
     echo "update-alternatives command not found. This script is intended for Debian/Ubuntu-based systems."
     exit 1
