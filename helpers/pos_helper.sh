@@ -66,7 +66,7 @@ runExperiment() {
 	echo "  running experiment on host(s) ${NODES[*]}"
 	player=0
 	ipaddr=2
-	path=/root/sevarebenchmotion/host_scripts/
+	path=/root/sevarebenchmotion/host_scripts
 	script="$path"/measurement.sh
 		
 	for node in "${NODES[@]}"; do
