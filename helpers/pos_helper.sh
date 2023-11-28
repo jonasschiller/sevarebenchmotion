@@ -46,7 +46,7 @@ initializePOS() {
 setupHost() {
 	echo "  setting up host(s) ${NODES[*]}"
 	ipaddr=2
-	path=/root/sevarebench/host_scripts/
+	path=/root/sevarebenchmotion/host_scripts/
 	for node in "${NODES[@]}"; do
 		{ "$POS" comm laun --infile host_scripts/host_setup.sh --blocking "$node";
 		echo "      $node host setup successfull";
@@ -66,7 +66,7 @@ runExperiment() {
 	echo "  running experiment on host(s) ${NODES[*]}"
 	player=0
 	ipaddr=2
-	path=/root/sevarebench/host_scripts
+	path=/root/sevarebenchmotion/host_scripts
 	script="$path"/measurement.sh
 		
 	for node in "${NODES[@]}"; do
