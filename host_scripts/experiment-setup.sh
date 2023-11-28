@@ -135,67 +135,67 @@ sleep $((ipaddr-2))
 
 # log link test
 for ip in "${ips[@]}"; do
-	ping -c 5 10.10."$network"."$ip" &>> pinglog || true
+ping -c 5 10.10."$network"."$ip" &>> pinglog || true
 done
 
-pos_upload pinglog
+# pos_upload pinglog
 
 # log link test
 # shellcheck source=../tools/speedtest.sh
-source "$REPO2_DIR"/tools/speedtest.sh
+# source "$REPO2_DIR"/tools/speedtest.sh
 
-{
-	startserver
+# {
+# startserver
 
-	for serverip in $(seq 2 $((groupsize+1))); do
-		for clientip in $(seq 2 $((groupsize+1))); do
-			pos_sync
-			# skip the server
-			[ "$serverip" -eq "$clientip" ] && continue
-			# skip other clients for now
-			[ "$ipaddr" -ne "$clientip" ] && continue
-			# skip the client server roles repetitions, this is here explicitly and not 
-			# merged with case one so that this can be deactivated easily if wanted
-			[ "$serverip" -gt "$clientip" ] && continue			
+# for serverip in $(seq 2 $((groupsize+1))); do
+# 	for clientip in $(seq 2 $((groupsize+1))); do
+# 		pos_sync
+# 		# skip the server
+# 		[ "$serverip" -eq "$clientip" ] && continue
+# 		# skip other clients for now
+# 		[ "$ipaddr" -ne "$clientip" ] && continue
+# 		# skip the client server roles repetitions, this is here explicitly and not 
+# 		# merged with case one so that this can be deactivated easily if wanted
+# 		[ "$serverip" -gt "$clientip" ] && continue			
 
-			hostname="${hostname::-1}$serverip"
-			echo "measured speed between nodes $((serverip-1)) and $((clientip-1))"
-			for k in 1 10; do
-					threads="$k"
-					echo -e "\n Threads: $k"
-					startclient | grep total
-			done
-		done
-	done
-} > speedtest
+# 		hostname="${hostname::-1}$serverip"
+# 		echo "measured speed between nodes $((serverip-1)) and $((clientip-1))"
+# 		for k in 1 10; do
+# 				threads="$k"
+# 				echo -e "\n Threads: $k"
+# 				startclient | grep total
+# 		done
+# 	done
+# done
+# } > speedtest
 
-stopserver
+#stopserver
 
-pos_upload speedtest
+#pos_upload speedtest
 
 # set up swap disk for RAM pageswapping measurements
-if [ -n "$SWAP" ] && [ -b /dev/nvme0n1 ]; then
-	echo "creating swapfile with swap size $SWAP"
-	parted -s /dev/nvme0n1 mklabel gpt
-	parted -s /dev/nvme0n1 mkpart primary ext4 0% 100%
-	mkfs.ext4 -FL swap /dev/nvme0n1
-	mkdir /swp
-	mkdir /whale
-	mount -L swap /swp
-	dd if=/dev/zero of=/swp/swp_file bs=1024 count="$SWAP"K
-	chmod 600 /swp/swp_file
-	mkswap /swp/swp_file
-	swapon /swp/swp_file
-	 # create ramdisk
-    totalram=$(free -m | grep "Mem:" | awk '{print $2}')
-	mount -t tmpfs -o size="$totalram"M swp /whale
-	# preoccupy ram and only leave 16 GiB for faster experiment runs
-	# it was observed, that more than that was never required and 
-	# falloc is slow in loops on nodes with large ram
-	ram=$((16*1024))
-	availram=$(free -m | grep "Mem:" | awk '{print $7}')
-	fallocate -l $((availram-ram))M /whale/filler
-fi
+# if [ -n "$SWAP" ] && [ -b /dev/nvme0n1 ]; then
+# echo "creating swapfile with swap size $SWAP"
+# parted -s /dev/nvme0n1 mklabel gpt
+# parted -s /dev/nvme0n1 mkpart primary ext4 0% 100%
+# mkfs.ext4 -FL swap /dev/nvme0n1
+# mkdir /swp
+# mkdir /whale
+# mount -L swap /swp
+# dd if=/dev/zero of=/swp/swp_file bs=1024 count="$SWAP"K
+# chmod 600 /swp/swp_file
+# mkswap /swp/swp_file
+# swapon /swp/swp_file
+# 	# create ramdisk
+# totalram=$(free -m | grep "Mem:" | awk '{print $2}')
+# mount -t tmpfs -o size="$totalram"M swp /whale
+# # preoccupy ram and only leave 16 GiB for faster experiment runs
+# # it was observed, that more than that was never required and 
+# # falloc is slow in loops on nodes with large ram
+# ram=$((16*1024))
+# availram=$(free -m | grep "Mem:" | awk '{print $7}')
+# fallocate -l $((availram-ram))M /whale/filler
+# fi
 
 echo "experiment setup successful"
 
