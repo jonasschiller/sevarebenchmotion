@@ -78,12 +78,12 @@ pos_sync --timeout 300
 #Build a String of the IP Adresses of the parties
 ips=""
 for i in $(seq 2 $((partysize+1))); do
-    ips+="10.10.$network.$i "
+    ips+="$((i-2)),10.10.$network.$i,2300$i "
 done
 
 # run the SMC protocol
 $skip ||
-    /bin/time -f "$timerf" ./"crosstabs" --my-id $player --players $ips --input 1 3 5 6 &> "$log" || success=false
+    /bin/time -f "$timerf" ./"crosstabs" --my-id $player --parties $ips --input 1 3 5 6 &> "$log" || success=false
 
 pos_upload  "$log"
 
