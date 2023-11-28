@@ -37,9 +37,6 @@ done
 echo "experiment setup complete"
 
 
-
-
-
 RUNSTATUS="${Orange}incomplete${Stop}"
 
 echo "running experiment on hosts..."
