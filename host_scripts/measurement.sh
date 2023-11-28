@@ -72,7 +72,7 @@ log=testresultsFirstRun
 touch "$log"
 
 success=true
-
+skip=false    
 pos_sync --timeout 300
 
 #Build a String of the IP Adresses of the parties
