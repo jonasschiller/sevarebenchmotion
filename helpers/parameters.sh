@@ -130,7 +130,7 @@ setParameters() {
         for parsing arguments."; }
     # define the flags for the parameters
     # ':' means that the flag expects an argument.
-    SHORT=n:,e:,h
+    SHORT=n:,e:,h,x
     LONG=nodes:,experiment:,config:,help
 
     PARSED=$(getopt --options ${SHORT} \
@@ -153,7 +153,8 @@ setParameters() {
             --config)
                 parseConfig "$2" "$4"
                 exit 0;;
-            
+            -x)
+                CONFIGRUN=true;;
             *) error $LINENO "${FUNCNAME[0]}(): unrecognized flag $1 $2";;
         esac
         shift || true      # skip to next option-argument pair
