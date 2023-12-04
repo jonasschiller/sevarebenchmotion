@@ -147,6 +147,9 @@ setParameters() {
             -n|--nodes) 
                 setArray NODES "$2"
                 shift;;
+            --config)
+                parseConfig "$2" "$4"
+                exit 0;;
             *) error $LINENO "${FUNCNAME[0]}(): unrecognized flag $1 $2";;
         esac
         shift || true      # skip to next option-argument pair
@@ -156,4 +159,106 @@ setParameters() {
     # node already in use check
     #nodetasks=$(pgrep -facu "$(id -u)" "${NODES[0]}")
     #[ "$nodetasks" -gt 10 ] && error $LINENO "${FUNCNAME[0]}(): it appears host ${NODES[0]} is currently in use"
+     # generate loop-variables.yml (append random num to mitigate conflicts)
+    loopvarpath="experiments/loop-variables-$NETWORK.yml"
+    rm -f "$loopvarpath"
+    for type in "${TTYPES[@]}"; do
+        declare -n ttypes="${type}"
+        parameters="${ttypes[*]}"
+        echo "${type,,}: [${parameters// /, }]" >> "$loopvarpath"
+    done
+    parameters="${INPUTS[*]}"
+    echo "input_size: [${parameters// /, }]" >> "$loopvarpath"
+
+    # delete line measureram from loop_var, if active
+    sed -i '/measureram/d' "$loopvarpath"
+    # set default swap size, in case --ram is defined
+    [ "${#RAM[*]}" -gt 0 ] && SWAP=${SWAP:-4096}
+
+     # Experiment run summary  information output
+    SUMMARYFILE="$EXPORTPATH/run-summary.dat"
+    mkdir -p "$EXPORTPATH" && rm -rf "$SUMMARYFILE"
+    {
+    echo "  Setup:"
+    echo "    Experiment = $EXPERIMENT $ETYPE"
+    echo "    Nodes = ${NODES[*]}"
+    echo "    Internal network = 10.10.$NETWORK.0/24"
+    echo "    Inputs = ${INPUTS[*]}"
+    echo "    Testtypes:"
+    for type in "${TTYPES[@]}"; do
+        declare -n ttypes="${type}"
+        echo -e "      $type\t= ${ttypes[*]}"
+    done
+    echo "  Summary file = $SUMMARYFILE"
+    } | tee "$SUMMARYFILE"
+}
+
+
+# inspired by https://unix.stackexchange.com/a/206216
+parseConfig() {
+
+    # overwrite the main trap
+    trap configruntrap 0
+
+    configs=()
+    # file or folder?
+    if [ -f "$1" ]; then
+        configs=( "$1" )
+    elif [ -d "$1" ]; then
+        # add all config files in the folder to the queue 
+        while IFS= read -r conf; do
+            configs+=( "$conf" )
+        done < <(find "$1" -maxdepth 1 -name "*.conf" | sort)
+    else
+        error ${LINENO} "${FUNCNAME[0]}(): no such file or directory: $1"
+    fi
+
+    for conf in "${configs[@]}"; do
+
+        echo -e "\n_____________________________________"
+        echo "###   Starting new config file \"$conf\" ###"
+        echo -e "_____________________________________\n"
+
+        declare -A config=()
+        while read -r line; do
+            # skip # lines
+            [[ "${line::4}" == *"#"* ]] && continue
+            # sanitize a little by removing everything after any space char
+            sanline="${line%% *}"
+
+            flag=$(echo "$sanline" | cut -d '=' -f 1)
+            parameter=$(echo "$sanline" | cut -d '=' -f 2-)
+            [ -n "$parameter" ] && config[$flag]="$parameter"
+            # for flags without parameter, cut returns the flag
+            [ "$flag" == "$parameter" ] && config[$flag]=""
+        done < "$conf"
+
+        # also allow specifying the nodes via commandline in the form
+        # ./sevarebench.sh --config xy.conf nodeA,nodeB,...
+        [ -z "${config[nodes]}" ] && config[nodes]="$2"
+        # override mode for externally defined nodes
+        #[ -n "$2" ] && config[nodes]="$2"
+
+        while read -rd , experiment; do
+
+            echo -e "\n_____________________________________"
+            echo "###   Starting new experiment run ###"
+            echo -e "_____________________________________\n"
+            # generate the specifications
+            flagsnparas=( --experiment "$experiment" )
+            for flag in "${!config[@]}"; do
+                # skip experiment flag
+                [ "$flag" != experiments ] && flagsnparas=( "${flagsnparas[@]}" --"$flag" "${config[$flag]}" )
+            done
+            echo "running \"bash $0 ${flagsnparas[*]}\""
+
+            # run a new instance of sevarebench with the parsed parameters
+            # internal flag -x prevents the recursive closing of the process
+            # group in the trap logic that would also close this instance
+            bash "$0" -x "${flagsnparas[@]}" || 
+                error ${LINENO} "${FUNCNAME[0]}(): stopping config run due to an error"
+                
+        done <<< "${config[experiments]}",
+
+    done
 }
