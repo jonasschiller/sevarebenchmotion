@@ -141,7 +141,7 @@ done
 pos_upload pinglog
 
 #log link test
-shellcheck source=../tools/speedtest.sh
+#shellcheck source=../tools/speedtest.sh
 source "$REPO2_DIR"/tools/speedtest.sh
 
 {
