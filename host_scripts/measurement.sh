@@ -83,7 +83,7 @@ done
 
 # run the SMC protocol
 $skip ||
-    /bin/time -f "$timerf" ./"crosstabs" --my-id $player --parties $ips --input 1 3 5 6 9 &> "$log" || success=false
+    /bin/time -f "$timerf" ./"multiplication" --my-id $player --parties $ips --input-file "/root/MOTION/src/multiplication/mult.txt" &> "$log" || success=false
 
 pos_upload  "$log"
 

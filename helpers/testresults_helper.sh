@@ -17,8 +17,8 @@ verifyExperiment() {
     while [ -n "$loopinfo" ]; do
 
         # get pos filepath of the measurements for the current loop
-        experimentresult=$(find "$resultpath" -name "testresults$cdomain${protocol}_run*$i" -print -quit)
-        verificationresult=$(find "$resultpath" -name "measurementlog${cdomain}_run*$i" -print -quit)
+        experimentresult=$(find "$resultpath" -name "testresults_run*$i" -print -quit)
+        verificationresult=$(find "$resultpath" -name "measurementlog_run*$i" -print -quit)
 
         # check existance of files
         if [ ! -f "$experimentresult" ] || [ ! -f "$verificationresult" ]; then
@@ -75,110 +75,77 @@ exportExperimentResults() {
     done
 
     # generate header line of data dump with column information
-    basicInfo1="program;c.domain;adv.model;protocol;partysize;comp.time(s);comp.peakRAM(MiB);bin.filesize(MiB);"
+    basicInfo1="program;partysize;comp.time(s);comp.peakRAM(MiB);bin.filesize(MiB);"
     basicInfo2="${dyncolumns}runtime_internal(s);runtime_external(s);peakRAM(MiB);jobCPU(%);P0commRounds;P0dataSent(MB);ALLdataSent(MB)"
     compileInfo="comp.P0intin;comp.P1intin;comp.P2intin;comp.P0bitin;comp.P1bitin;compP2bitin;comp.intbits;comp.inttriples;comp.bittriples;comp.vmrounds;"
     echo -e "${basicInfo1}${basicInfo2}" > "$datatableShort"
     echo -e "${basicInfo1}${compileInfo}${basicInfo2};Tx(MB);Tx(rounds);Tx(s);Rx(MB);Rx(rounds);Rx(s);Brcasting(MB);Brcasting(rounds);Brcasting(s);TxRx(MB);TxRx(rounds);TxRx(s);Passing(MB);Passing(rounds);Passing(s);Part.Brcasting(MB);Part.Brcasting(rounds);Part.Brcasting(s);Ex(MB);Ex(rounds);Ex(s);Ex1to1(MB);Ex1to1(rounds);Ex1to1(s);Rx1to1(MB);Rx1to1(rounds);Rx1to1(s);Tx1to1(MB);Tx1to1(rounds);Tx1to1(s);Txtoall(MB);Txtoall(rounds);Txtoall(s)" > "$datatableFull"
 
     # grab all the measurement information and append it to the datatable
-    for cdomain in "${CDOMAINS[@]}"; do
-        declare -n cdProtocols="${cdomain}PROTOCOLS"
-        for protocol in "${cdProtocols[@]}"; do
-        protocol=${protocol::-8}
-
-            advModel=""
-            setAdvModel "$protocol"
-            i=0
-            # get loopfile path for the current variables
-            loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
-            echo "  exporting $protocol"
-            # while we find a next loop info file do
-            while [ -n "$loopinfo" ]; do
-                loopvalues=""
-                # extract loop var values
-                for value in $(jq -r 'values[]' "$loopinfo"); do
-                    loopvalues+="$value;"
-                done
-
-                # the actual number of participants
-                partysize=""
-                setPartySize "$protocol"
-                
-                # get pos filepath of the measurements for the current loop
-                compileinfo=$(find "$resultpath" -name "measurementlog${cdomain}_run*$i" -print -quit)
-                runtimeinfo=$(find "$resultpath" -name "testresults$cdomain${protocol}_run*$i" -print -quit)
-                if [ ! -f "$runtimeinfo" ] || [ ! -f "$compileinfo" ]; then
-                    styleOrange "    Skip - File not found error: runtimeinfo or compileinfo"
-                    continue 2
-                fi
-
-                ## Minimum result measurement information
-                ######
-                # extract measurement
-                compiletime=$(grep "Elapsed wall clock" "$compileinfo" | tail -n 1 | cut -d ' ' -f 1)
-                compilemaxRAMused=$(grep "Maximum resident" "$compileinfo" | tail -n 1 | cut -d ' ' -f 1)
-                binfsize=$(grep "Binary file size" "$compileinfo" | tail -n 1 | cut -d ' ' -f 1)
-                [ -n "$compilemaxRAMused" ] && compilemaxRAMused="$((compilemaxRAMused/1024))"
-                runtimeint=$(grep "Time =" "$runtimeinfo" | awk '{print $3}')
-                runtimeext=$(grep "Elapsed wall clock" "$runtimeinfo" | cut -d ' ' -f 1)
-                maxRAMused=$(grep "Maximum resident" "$runtimeinfo" | cut -d ' ' -f 1)
-                [ -n "$maxRAMused" ] && maxRAMused="$((maxRAMused/1024))"
-                jobCPU=$(grep "CPU this job" "$runtimeinfo" | cut -d '%' -f 1)
-                maxRAMused=${maxRAMused:-NA}
-                compilemaxRAMused=${compilemaxRAMused:-NA}
-
-                commRounds=$(grep "Data sent =" "$runtimeinfo" | awk '{print $7}')
-                dataSent=$(grep "Data sent =" "$runtimeinfo" | awk '{print $4}')
-                globaldataSent=$(grep "Global data sent =" "$runtimeinfo" | awk '{print $5}')
-                basicComm="${commRounds:-NA};${dataSent:-NA};${globaldataSent:-NA}"
-
-                # put all collected info into one row (Short)
-                basicInfo="${EXPERIMENT::2};$cdomain;$advModel;$protocol;$partysize;${compiletime:-NA};$compilemaxRAMused;${binfsize:-NA}"
-                echo -e "$basicInfo;$loopvalues$runtimeint;$runtimeext;$maxRAMused;$jobCPU;$basicComm" >> "$datatableShort"
-
-                ## Full result measurement information
-                ######
-                # extract compile information (this is repeated many times, potential to optimize)
-                p0intin=$(grep " integer inputs from player 0" "$compileinfo" | awk '{print $1}')
-                p1intin=$(grep " integer inputs from player 1" "$compileinfo" | awk '{print $1}')
-                p2intin=$(grep " integer inputs from player 2" "$compileinfo" | awk '{print $1}')
-                p0bitin=$(grep " bit inputs from player 0" "$compileinfo" | awk '{print $1}')
-                p1bitin=$(grep " bit inputs from player 1" "$compileinfo" | awk '{print $1}')
-                p2bitin=$(grep " bit inputs from player 2" "$compileinfo" | awk '{print $1}')
-                inputs="${p0intin:-NA};${p1intin:-NA};${p2intin:-NA};${p0bitin:-NA};${p1bitin:-NA};${p2bitin:-NA}"
-
-                intbits=$(grep " integer bits" "$compileinfo" | awk '{print $1}')
-                inttriples=$(grep " integer triples" "$compileinfo" | awk '{print $1}')
-                bittriples=$(grep " bit triples" "$compileinfo" | awk '{print $1}')
-                vmrounds=$(grep " virtual machine rounds" "$compileinfo" | awk '{print $1}')
-
-                compilevalues="$inputs;${intbits:-NA};${inttriples:-NA};${bittriples:-NA};${vmrounds:-NA}"
-
-                declare {Tx,Rx,broadcast,TxRx,passing,partBroadcast,Ex,Ex1to1,Rx1to1,Tx1to1,Txtoall}=""
-                # infolineparser $1=regex $2=var-reference $3=column1 $4=column2 $5=column3
-                infolineparser "Sending directly " "Tx" 3 6 9
-                infolineparser "Receiving directly " "Rx" 3 6 9
-                infolineparser "Broadcasting " "broadcast" 2 5 8
-                infolineparser "Sending/receiving " "TxRx" 2 5 8
-                infolineparser "Passing around " "passing" 3 6 9
-                infolineparser "Partial broadcasting " "partBroadcast" 3 6 9
-                infolineparser "Exchanging " "Ex" 2 5 8
-                infolineparser "Exchanging one-to-one " "Ex1to1" 3 6 9
-                infolineparser "Receiving one-to-one " "Rx1to1" 3 6 9
-                infolineparser "Sending one-to-one " "Tx1to1" 3 6 9
-                infolineparser "Sending to all " "Txtoall" 4 7 10
-
-                measurementvalues="$runtimeint;$runtimeext;$maxRAMused;$jobCPU;$basicComm;$Tx;$Rx;$broadcast;$TxRx;$passing;$partBroadcast;$Ex;$Ex1to1;$Rx1to1;$Tx1to1;$Txtoall"
-
-                # put all collected info into one row (Full)
-                echo -e "$basicInfo;$compilevalues;$loopvalues$measurementvalues" >> "$datatableFull"
-
-                # locate next loop file
-                ((++i))
-                loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
-            done
+   
+    i=0
+    # get loopfile path for the current variables
+    loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
+    echo "  exporting $protocol"
+    # while we find a next loop info file do
+    while [ -n "$loopinfo" ]; do
+        loopvalues=""
+        # extract loop var values
+        for value in $(jq -r 'values[]' "$loopinfo"); do
+            loopvalues+="$value;"
         done
+
+        # the actual number of participants
+        partysize=${#NODES[*]}
+        
+        # get pos filepath of the measurements for the current loop
+        runtimeinfo=$(find "$resultpath" -name "testresults_run*$i" -print -quit)
+        if [ ! -f "$runtimeinfo" ] || [ ! -f "$compileinfo" ]; then
+            styleOrange "    Skip - File not found error: runtimeinfo or compileinfo"
+            continue 2
+        fi
+
+        ## Minimum result measurement information
+        ######
+        # extract measurement
+        runtimeint=$(grep "Circuit Evaluation" "$runtimeinfo" | awk '{print $3}')
+        runtimeext=$(grep "Elapsed wall clock time" "$runtimeinfo" | cut -d ' ' -f 1)
+        maxRAMused=$(grep "Maximum resident" "$runtimeinfo" | cut -d ' ' -f 1)
+        [ -n "$maxRAMused" ] && maxRAMused="$((maxRAMused/1024))"
+        jobCPU=$(grep "CPU this job" "$runtimeinfo" | cut -d '%' -f 1)
+        maxRAMused=${maxRAMused:-NA}
+
+        dataSent=$(grep "Sent:" "$runtimeinfo" | awk '{print $2}')
+        dataRec=$(grep "Received:" "$runtimeinfo" | awk '{print $2}')
+        basicComm="${dataRec:-NA};${dataSent:-NA};"
+
+        # put all collected info into one row (Short)
+        basicInfo="${EXPERIMENT::2};$protocol;$partysize;"
+        echo -e "$basicInfo;$loopvalues$runtimeint;$runtimeext;$maxRAMused;$jobCPU;$basicComm" >> "$datatableShort"
+
+        ## Full result measurement information
+        ######
+        multTripPresetup=$(grep "MT Presetup" "$runtimeinfo" | awk '{print $3}')
+        multTripSetup=$(grep "MT Setup" "$runtimeinfo" | awk '{print $3}')
+        sharedPowerPresetup=$(grep "SP Presetup" "$runtimeinfo" | awk '{print $3}')
+        sharedPowerSetup=$(grep "SP Presetup" "$runtimeinfo" | awk '{print $3}')
+        sharedBitPresetup=$(grep "SB Setup" "$runtimeinfo" | awk '{print $3}')
+        sharedBitSetup=$(grep "SB Setup" "$runtimeinfo" | awk '{print $3}')
+        baseOT=$(grep "Base OTs" "$runtimeinfo" | awk '{print $3}')
+        otExtension=$(grep -m 1 "OT Extension Setup" "$runtimeinfo" | awk '{print $3}')
+        kk13OtExtension=$(grep "KK13 OT Extension Setup" "$runtimeinfo" | awk '{print $3}')
+        preprocessingTime=$(grep "Preprocessing Total" "$runtimeinfo" | awk '{print $3}')
+        gatesSetup=$(grep "Gates Setup" "$runtimeinfo" | awk '{print $3}')
+        gatesOnline=$(grep "Gates Online" "$runtimeinfo" | awk '{print $3}')
+
+        measurementvalues="$multTripPresetup;$multTripSetup;$sharedPowerPresetup;$sharedPowerSetup;$sharedBitPresetup;$sharedBitSetup;baseOT;$otExtension;$kk13OtExtension;$preprocessingTime;$gatesSetup;$gatesOnline;"
+
+        # put all collected info into one row (Full)
+        echo -e "$basicInfo;$compilevalues;$loopvalues$measurementvalues" >> "$datatableFull"
+
+        # locate next loop file
+        ((++i))
+        loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
     done
     # check if there was something exported
     rowcount=$(wc -l "$datatableShort" | awk '{print $1}')
@@ -244,40 +211,4 @@ infolineparser() {
     Rounds=$(grep "$regex" "$runtimeinfo" | head -n 1 | cut -d ' ' -f "$4")
     Sec=$(grep "$regex" "$runtimeinfo" | head -n 1 | cut -d ' ' -f "$5")
     target="${MB:-NA};${Rounds:-NA};${Sec:-NA}"
-}
-
-# find out and set a protocols adversary model
-setAdvModel() {
-    protocol="$1"
-    if [[ " ${maldishonestProtocols[*]} " == *" $protocol "* ]]; then
-        advModel=maldishonest
-    elif [[ " ${covertdishonestProtocols[*]} " == *" $protocol "* ]]; then
-        advModel=covertdishonest
-    elif [[ " ${semidishonestProtocols[*]} " == *" $protocol "* ]]; then
-        advModel=semidishonest
-    elif [[ " ${malhonestProtocols[*]} " == *" $protocol "* ]]; then
-        advModel=malhonest
-    elif [[ " ${semihonestProtocols[*]} " == *" $protocol "* ]]; then
-        advModel=semihonest
-    fi
-}
-
-# find out the actual party size, the nodecount does not imply the size
-# since the program only uses as many nodes needed from all available
-setPartySize() {
-
-    protocol="$1"
-    nodecount="${#NODES[*]}"
-    partysize=""
-
-    if [[ " ${N4Protocols[*]} " == *" $protocol "* ]]; then
-        partysize="4"
-    elif [[ " ${N3Protocols[*]} " == *" $protocol "* ]]; then
-        partysize="3"
-    elif [[ " ${N2Protocols[*]} " == *" $protocol "* ]]; then
-        partysize="2"
-    fi
-
-    partysize=${partysize:-$nodecount}
-
 }
