@@ -131,7 +131,7 @@ setParameters() {
     # define the flags for the parameters
     # ':' means that the flag expects an argument.
     SHORT=n:,h
-    LONG=nodes:,help
+    LONG=nodes:,config:,help
 
     PARSED=$(getopt --options ${SHORT} \
                     --longoptions ${LONG} \
