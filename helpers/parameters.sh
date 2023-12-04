@@ -130,8 +130,8 @@ setParameters() {
         for parsing arguments."; }
     # define the flags for the parameters
     # ':' means that the flag expects an argument.
-    SHORT=n:,e:,h,x
-    LONG=nodes:,experiment:,config:,help
+    SHORT=n:,e:,i:,m:,c:,q:,f:,r:,l:,b:,d:,h,x
+    LONG=nodes:,experiment:,config:,input:,measureram:,cpu:,cpuquota:,freq:,ram:,latency:,bandwidth:,packetdrop:,help
 
     PARSED=$(getopt --options ${SHORT} \
                     --longoptions ${LONG} \
@@ -149,6 +149,44 @@ setParameters() {
                 shift;;
             -e|--experiment)
                 EXPERIMENT="$2"
+                shift;;
+            -i|--input)
+                setArray INPUTS "$2"
+                shift;;
+            -m|--measureram)
+                TTYPES+=( MEASURERAM );;
+            # Host environment manipulation
+            -c|--cpu)
+                TTYPES+=( CPUS )
+                setArray CPUS "$2"
+                shift;;
+            -q|--cpuquota)
+                TTYPES+=( QUOTAS )
+                setArray QUOTAS "$2"
+                shift;;
+            -f|--freq)
+                TTYPES+=( FREQS )
+                setArray FREQS "$2"
+                shift;;
+            -r|--ram)
+                TTYPES+=( RAM )
+                setArray RAM "$2"
+                shift;;
+            # Network environment manipulation
+            -l|--latency)
+                TTYPES+=( LATENCIES )
+                setArray LATENCIES "$2"
+                shift;;
+            -b|--bandwidth)
+                TTYPES+=( BANDWIDTHS )
+                setArray BANDWIDTHS "$2"
+                shift;;
+            -d|--packetdrop)
+                TTYPES+=( PACKETDROPS )
+                setArray PACKETDROPS "$2"
+                shift;;
+            --swap)
+                SWAP="$2"
                 shift;;
             --config)
                 parseConfig "$2" "$4"
