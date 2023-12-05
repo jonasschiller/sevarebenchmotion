@@ -75,9 +75,6 @@ setArray() { # load array $1 reference with ,-seperated values in $2
     local -n array="$1"     # get array reference
     set -f                  # avoid * expansion
     IFS="," read -r -a array <<< "$2"
-    for element in "${array[@]}"; do
-        echo "$element"
-    done
 }
 
 TEMPFILES=()
