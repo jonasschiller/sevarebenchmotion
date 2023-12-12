@@ -83,7 +83,7 @@ done
 
 # run the SMC protocol
 $skip ||
-    /bin/time -f "$timerf" ./"multiplication" --my-id $player --parties $ips --input-file "/root/MOTION/src/examples/multiplication/mult.dat" &> "$log" || success=false
+    /bin/time -f "$timerf" ./"multiplication" --my-id $player --parties $ips --input-file "/root/sevarebenchmotion/experiments/mult.dat" &> "$log" || success=false
 
 pos_upload  "$log"
 
