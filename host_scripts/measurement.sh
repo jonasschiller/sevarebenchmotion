@@ -22,6 +22,7 @@ player=$1
 read -r -a types <<< "$2"
 network="$3"
 partysize=$4
+experiment=$5
 # default to etype 1 if unset
 etype=${etype:-1}
 
@@ -83,7 +84,7 @@ done
 
 # run the SMC protocol
 $skip ||
-    /bin/time -f "$timerf" ./"multiplication" --my-id $player --parties $ips --input-file "/root/sevarebenchmotion/experiments/mult.dat" &> "$log" || success=false
+    /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips --input-file "/root/sevarebenchmotion/experiments/mult.dat" &> "$log" || success=false
 
 pos_upload  "$log"
 
