@@ -112,8 +112,8 @@ RAM=()
 SWAP=""
 TTYPES=()
 PIDS=()
-NUMBER_OF_BITS=()
-INTEGER_SIZE=()
+NUMBER_OF_BITS=(100)
+INTEGER_SIZE=(32)
 # create a random network number to support multiple experiment runs 
 # on the same switch.   Generate random number  1 < number < 255
 NETWORK=$((RANDOM%253+2))
