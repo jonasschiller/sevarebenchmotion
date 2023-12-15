@@ -23,6 +23,8 @@ read -r -a types <<< "$2"
 network="$3"
 partysize=$4
 experiment=$5
+number_of_bits=$6
+integer_size=$7
 # default to etype 1 if unset
 etype=${etype:-1}
 
@@ -84,7 +86,7 @@ done
 
 # run the SMC protocol
 $skip ||
-    /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips --bitsize 1000000  &> "$log" || success=false
+    /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips --bitsize $number_of_bits &> "$log" || success=false
 
 pos_upload  "$log"
 
