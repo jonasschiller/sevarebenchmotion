@@ -86,7 +86,7 @@ done
 
 # run the SMC protocol
 $skip ||
-    /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips --bitsize $number_of_bits &> "$log" || success=false
+    /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips &> "$log" || success=false
 
 pos_upload  "$log"
 
