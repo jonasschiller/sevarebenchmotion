@@ -86,7 +86,7 @@ for protocol in "${protocols[@]}"; do
     pos_sync --timeout 300
     # run the SMC protocol
     $skip ||
-        /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips --protocol $protocol --sim $input &> "$log" || success=false
+        /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips --protocol $protocol --simd $input &> "$log" || success=false
     pos_upload --loop "$log"
     
     #abort if no success
