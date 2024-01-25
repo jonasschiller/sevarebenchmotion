@@ -112,8 +112,8 @@ RAM=()
 SWAP=""
 TTYPES=()
 PIDS=()
-NUMBER_OF_BITS=(100)
-INTEGER_SIZE=(32)
+NUMBER_OF_BITS=(32)
+INPUT_SIZE=(100)
 # create a random network number to support multiple experiment runs 
 # on the same switch.   Generate random number  1 < number < 255
 NETWORK=$((RANDOM%253+2))
@@ -129,8 +129,8 @@ setParameters() {
         for parsing arguments."; }
     # define the flags for the parameters
     # ':' means that the flag expects an argument.
-    SHORT=n:,e:,i:,m:,c:,q:,f:,r:,l:,b:,d:,h,x
-    LONG=nodes:,experiment:,config:,input:,measureram:,cpu:,cpuquota:,freq:,ram:,latency:,bandwidth:,packetdrop:,number_of_bits:,integer_size:,help
+    SHORT=n:,e:,i:,m:,c:,q:,f:,r:,l:,b:,d:,p:,h,x
+    LONG=nodes:,experiment:,config:,input:,measureram:,cpu:,cpuquota:,freq:,ram:,latency:,bandwidth:,packetdrop:,number_of_bits:,protocol:,help
 
     PARSED=$(getopt --options ${SHORT} \
                     --longoptions ${LONG} \
@@ -184,16 +184,16 @@ setParameters() {
                 TTYPES+=( PACKETDROPS )
                 setArray PACKETDROPS "$2"
                 shift;;
-            --number_of_bits)
+            --n|number_of_bits)
                 setArray NUMBER_OF_BITS "$2"
                 shift;;
-            --integer_size)
-                setArray INTEGER_SIZE "$2"
+            --i|input)
+                INPUT_SIZE= "$2"
                 shift;;
             --swap)
                 SWAP="$2"
                 shift;;
-            --protocol)
+            --p|protocol)
                 setArray PROTOCOLS "$2"
                 shift;;
             --config)

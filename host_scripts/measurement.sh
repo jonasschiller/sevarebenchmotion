@@ -24,7 +24,7 @@ network="$3"
 partysize="$4"
 experiment="$5"
 number_of_bits="$6"
-integer_size="$7"
+input="$7"
 read -r -a protocols <<< "$8"
 # default to etype 1 if unset
 etype=${etype:-1}
@@ -86,7 +86,7 @@ for protocol in "${protocols[@]}"; do
     pos_sync --timeout 300
     # run the SMC protocol
     $skip ||
-        /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips --protocol $protocol &> "$log" || success=false
+        /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips --protocol $protocol --sim $input &> "$log" || success=false
     pos_upload --loop "$log"
     
     #abort if no success
