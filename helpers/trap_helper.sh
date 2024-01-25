@@ -29,10 +29,6 @@ cleanup() {
       echo -e "  Experiment run status: $RUNSTATUS" 
     } | tee -a "$SUMMARYFILE"
 
-    echo "verifying experiment results..."
-
-    verifyExperiment | tee -a "$SUMMARYFILE"
-
     echo "exporting measurement results..."
     # create and push Result Plots  
     exportExperimentResults

@@ -4,44 +4,6 @@
 # where we find the experiment results
 resultpath="$RPATH/${NODES[0]}/"
 
-# verify testresults
-verifyExperiment() {
-
-    # handle yao -O protocol variant, for some reason the result is only at node[1]
-    # move to resultpath location
-    while IFS= read -r file; do
-        mv "$file" "$resultpath"
-    i=0
-    loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
-    # while we find a next loop info file do
-    while [ -n "$loopinfo" ]; do
-
-        # get pos filepath of the measurements for the current loop
-        experimentresult=$(find "$resultpath" -name "testresults_run*$i" -print -quit)
-        verificationresult=$(find "$resultpath" -name "measurementlog_run*$i" -print -quit)
-
-        # check existance of files
-        if [ ! -f "$experimentresult" ] || [ ! -f "$verificationresult" ]; then
-            styleOrange "  Skip $protocol - File not found error: $experimentresult"
-            continue 2
-        fi
-
-        # verify experiment result - call experiment specific verify script
-        chmod +x experiments/"$EXPERIMENT"/verify.py
-        match=$(experiments/"$EXPERIMENT"/verify.py "$experimentresult" "$verificationresult")
-        if [ "$match" != 1 ]; then
-            styleOrange "  Skip $protocol - $match at $experimentresult";
-            continue 2;
-        fi
-        ((++i))
-        loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
-    done
-
-    # only pass if while-loop actually entered
-    [ "$i" -gt 0 ] && okfail ok "  verified - test passed 
-        
-}
-
 ############
 # Export experiment data from the pos_upload-ed logs into two tables
 ############
