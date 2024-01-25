@@ -21,10 +21,11 @@ player=$1
 # test types to simulate changing environments like cpu frequency or network latency
 read -r -a types <<< "$2"
 network="$3"
-partysize=$4
-experiment=$5
-number_of_bits=$6
-integer_size=$7
+partysize="$4"
+experiment="$5"
+number_of_bits="$6"
+integer_size="$7"
+read -r -a protocols <<< "$8"
 # default to etype 1 if unset
 etype=${etype:-1}
 
@@ -84,11 +85,20 @@ for i in $(seq 2 $((partysize+1))); do
     ips+="$((i-2)),10.10.$network.$i,2300$i "
 done
 
-# run the SMC protocol
-$skip ||
-    /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips &> "$log" || success=false
+for protocol in "${protocols[@]}"; do
 
-pos_upload  "$log"
+    log=testresults"${protocol}"
+    touch "$log"
+    success=true
+
+    pos_sync --timeout 300
+    # run the SMC protocol
+    $skip ||
+        /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips --protocol $protocol &> "$log" || success=false
+    pos_upload --loop "$log"
+done
+
+
 
 #abort if no success
 $success

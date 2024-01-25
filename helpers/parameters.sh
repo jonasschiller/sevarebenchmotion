@@ -193,6 +193,9 @@ setParameters() {
             --swap)
                 SWAP="$2"
                 shift;;
+            --protocol)
+                setArray PROTOCOLS "$2"
+                shift;;
             --config)
                 parseConfig "$2" "$4"
                 exit 0;;
@@ -223,7 +226,19 @@ setParameters() {
     # set default swap size, in case --ram is defined
     [ "${#RAM[*]}" -gt 0 ] && SWAP=${SWAP:-4096}
 
-     # Experiment run summary  information output
+    # split up protocols to computation domains
+    for protocol in "${PROTOCOLS[@]}"; do
+        if [[ "arithmetic_gmw" == *" $protocol "* ]]; then
+            echo "arithmetic_gmw"
+        elif [[ "boolean_bmr" == *" $protocol "* ]]; then
+            echo "boolean_bmr"
+        elif [[ "boolean_gmw" == *" $protocol "* ]]; then
+            echo "boolean_gmw"
+        else
+            error $LINENO "${FUNCNAME[0]}(): protocol $protocol not supported"
+        fi
+    done
+    # Experiment run summary  information output
     SUMMARYFILE="$EXPORTPATH/run-summary.dat"
     mkdir -p "$EXPORTPATH" && rm -rf "$SUMMARYFILE"
     {
@@ -232,7 +247,9 @@ setParameters() {
     echo "    Nodes = ${NODES[*]}"
     echo "    Internal network = 10.10.$NETWORK.0/24"
     echo "    Inputs = ${INPUTS[*]}"
+    echo "    Protocols = ${PROTOCOLS[*]}"
     echo "    Testtypes:"
+    
     for type in "${TTYPES[@]}"; do
         declare -n ttypes="${type}"
         echo -e "      $type\t= ${ttypes[*]}"
