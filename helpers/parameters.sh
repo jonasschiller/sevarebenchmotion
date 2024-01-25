@@ -184,7 +184,7 @@ setParameters() {
                 TTYPES+=( PACKETDROPS )
                 setArray PACKETDROPS "$2"
                 shift;;
-            --n|number_of_bits)
+            --n|--number_of_bits)
                 setArray NUMBER_OF_BITS "$2"
                 shift;;
             --i|--input)
