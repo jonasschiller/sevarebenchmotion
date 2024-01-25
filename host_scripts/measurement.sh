@@ -96,14 +96,15 @@ for protocol in "${protocols[@]}"; do
     $skip ||
         /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties $ips --protocol $protocol &> "$log" || success=false
     pos_upload --loop "$log"
+    
+    #abort if no success
+    $success
+
+    pos_sync
 done
 
 
 
-#abort if no success
-$success
-
-pos_sync
 
 
 
