@@ -187,13 +187,13 @@ setParameters() {
             --n|number_of_bits)
                 setArray NUMBER_OF_BITS "$2"
                 shift;;
-            --i|input)
+            --i|--input)
                 INPUT_SIZE= "$2"
                 shift;;
             --swap)
                 SWAP="$2"
                 shift;;
-            --p|protocol)
+            --p|--protocol)
                 setArray PROTOCOLS "$2"
                 shift;;
             --config)
