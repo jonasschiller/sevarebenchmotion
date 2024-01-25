@@ -7,6 +7,7 @@ resultpath="$RPATH/${NODES[0]}/"
 ############
 # Export experiment data from the pos_upload-ed logs into two tables
 ############
+
 exportExperimentResults() {
 
     # set up location

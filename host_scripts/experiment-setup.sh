@@ -23,13 +23,13 @@ groupsize=${#nodes[*]}
 
 # driver for Intel Network Adapter for E810 100G card
 installDriver() {
-	wget https://downloadmirror.intel.com/763930/ice-1.10.1.2.2.tar.gz
-	tar -xf ice-1.10.1.2.2.tar.gz
-	cd ice-1.10.1.2.2/src/
+	wget https://downloadmirror.intel.com/812404/ice-1.13.7.tar.gz
+	tar -xf ice-1.13.7.tar.gz
+	cd ice-1.13.7/src/
 	make install &> makelog || true
 	cd ..
 	mkdir -p /lib/firmware/updates/intel/ice/ddp/
-	cp ddp/ice-1.3.30.0.pkg /lib/firmware/updates/intel/ice/ddp/
+	cp ddp/ice-1.3.35.0.pkg /lib/firmware/updates/intel/ice/ddp/
 	modprobe -r ice
 	modprobe ice
 }
@@ -48,7 +48,7 @@ ips=()
 ### three nodes indirect connection topology setup
 ### node 2 --- node 1 --- node 3
 ### for 25G+ speeds set MTU
-if [ "$(hostname | grep -cE "gard|goracle|zone")" -eq 1 ]; then
+if [ "$nic1" != 0 ] && [ "$nic2" != 0 ]  && [ "$groupsize" == 4 ]; then
 
 	# install ddp drivers
 	installDriver
@@ -78,14 +78,14 @@ if [ "$(hostname | grep -cE "gard|goracle|zone")" -eq 1 ]; then
 		ip route add 10.10."$network".3 via 10.10."$network".2
 	fi
 # three nodes direct connection topology if true
-elif [ "$nic1" != 0 ]; then
+elif [ "$nic1" != 0 ] && [ "$groupsize" == 3 ]; then
 ##### three nodes direct connection topology if true
 ####if [ "$nic1" != 0 ]; then
 
 	# to achieve high speeds, install ddp drivers
 	[ "$(hostname | grep -cE "meld|tinyman|yieldly|gard|goracle|zone")" -eq 1 ] && \
 		installDriver
-
+	sleep 10
 	# verify that nodes array is circularly sorted like
 	# --nodes nodeA,nodeB,nodeC or --node nodeC,nodeA,nodeB
 	# this is required for the definition of this topology
