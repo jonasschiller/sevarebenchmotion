@@ -70,15 +70,6 @@ esac
 #  environment manipulation section stop
 ####
 
-
-
-log=testresultsFirstRun
-touch "$log"
-
-success=true
-skip=false    
-pos_sync --timeout 300
-
 #Build a String of the IP Adresses of the parties
 ips=""
 for i in $(seq 2 $((partysize+1))); do
@@ -90,6 +81,7 @@ for protocol in "${protocols[@]}"; do
     log=testresults"${protocol}"
     touch "$log"
     success=true
+    skip=false
 
     pos_sync --timeout 300
     # run the SMC protocol
