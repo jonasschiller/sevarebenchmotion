@@ -228,11 +228,11 @@ setParameters() {
 
     # split up protocols to computation domains
     for protocol in "${PROTOCOLS[@]}"; do
-        if [[ "arithmetic_gmw" == *"$protocol"* ]]; then
+        if [[ "arithmetic_gmw" == "$protocol" ]]; then
             echo "arithmetic_gmw"
-        elif [[ "boolean_bmr" == *"$protocol"* ]]; then
+        elif [[ "boolean_bmr" == "$protocol" ]]; then
             echo "boolean_bmr"
-        elif [[ "boolean_gmw" == *"$protocol"* ]]; then
+        elif [[ "boolean_gmw" == "$protocol" ]]; then
             echo "boolean_gmw"
         else
             error $LINENO "${FUNCNAME[0]}(): protocol $protocol not supported"
