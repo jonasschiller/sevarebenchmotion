@@ -78,7 +78,7 @@ runExperiment() {
 		# send all ip addresses so it can be formated into the motion style execution
 		{ 	"$POS" comm laun --blocking "$node" -- /bin/bash "$path"/experiment-reset.sh;
 			"$POS" comm laun --blocking --loop "$node" -- \
-				/bin/bash "$script" "$player" "${TTYPES[*]}" "$NETWORK" "${#NODES[*]}" "$EXPERIMENT" "$NUMBER_OF_BITS" "$INPUT_SIZE" "$PROTOCOLS";
+				/bin/bash "$script" "$player" "${TTYPES[*]}" "$NETWORK" "${#NODES[*]}" "$EXPERIMENT" "$NUMBER_OF_BITS" "$INPUT_SIZE" "${PROTOCOLS[*]}";
 		} &
 		PIDS+=( $! )
 		((++player))

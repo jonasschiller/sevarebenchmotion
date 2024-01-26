@@ -97,10 +97,6 @@ progflags=""
 runflags=""
 NODES=()
 PROTOCOLS=()
-CDOMAINS=()
-FIELDPROTOCOLS=()
-RINGPROTOCOLS=()
-BINARYPROTOCOLS=()
 INPUTS=()
 CPUS=()
 QUOTAS=()
@@ -190,12 +186,13 @@ setParameters() {
             --i|--input)
                 INPUT_SIZE= "$2"
                 shift;;
-            --swap)
-                SWAP="$2"
-                shift;;
             --p|--protocol)
                 setArray PROTOCOLS "$2"
                 shift;;
+            --swap)
+                SWAP="$2"
+                shift;;
+            
             --config)
                 parseConfig "$2" "$4"
                 exit 0;;

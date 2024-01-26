@@ -28,7 +28,6 @@ input="$7"
 read -r -a protocols <<< "$8"
 # default to etype 1 if unset
 etype=${etype:-1}
-echo $protocols
 cd "$REPO_DIR"/build/bin
 
 ####
