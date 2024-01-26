@@ -120,8 +120,8 @@ esac
 ####
 
 
-pos_sync
+pos_sync --loop
 
 echo "experiment successful"  >> measurementlog
 
-pos_upload measurementlog
+pos_upload --loop measurementlog
