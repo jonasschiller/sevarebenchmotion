@@ -7,7 +7,6 @@
 # of the system from before the framework was started.
 # It also verifies and exports measurement results
 
-source "$HELPERS_DIR"/testresults_helper.sh
 
 cleanup() {
 

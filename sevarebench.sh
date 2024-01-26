@@ -38,7 +38,7 @@ echo "experiment setup complete"
 
 
 RUNSTATUS="${Orange}incomplete${Stop}"
-
+source helpers/testresults_helper.sh
 echo "running experiment on hosts..."
 PIDS=()
 runExperiment 
