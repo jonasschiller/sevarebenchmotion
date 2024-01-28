@@ -14,6 +14,8 @@ set -x
 REPO_DIR=$(pos_get_variable repo_dir --from-global)
 #Get sevarebench directory
 REPO2_DIR=$(pos_get_variable repo2_dir --from-global)
+
+size=$(pos_get_variable input_size --from-loop)
 #Set up measurement and define what to measure and output format
 timerf="%M (Maximum resident set size in kbytes)\n%e (Elapsed wall clock time in seconds)\n%P (Percent of CPU this job got)"
 #Get player id
@@ -76,12 +78,6 @@ for i in $(seq 2 $((partysize+1))); do
 done
 
 for protocol in "${protocols[@]}"; do
-
-    for input in "${input[@]}"; do
-        # run the SMC protocol
-       
-   
-
     log=testresults"${protocol}${input}"
     touch "$log"
     success=true
@@ -90,14 +86,13 @@ for protocol in "${protocols[@]}"; do
     pos_sync --timeout 300
     # run the SMC protocol
     $skip ||
-        /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties "$ips" --protocol "$protocol" --simd "$input" &> "$log" || success=false
+        /bin/time -f "$timerf" ./"$experiment" --my-id $player --parties "$ips" --protocol "$protocol" --simd "$size" &> "$log" || success=false
     pos_upload --loop "$log"
     
     #abort if no success
     $success
 
     pos_sync --loop
-    done
 done
 
 
