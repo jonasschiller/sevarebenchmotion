@@ -74,11 +74,11 @@ esac
 #Build a String of the IP Adresses of the parties
 ips=""
 for i in $(seq 2 $((partysize+1))); do
-    ips+="$((i-2)),10.10.$network.$i,2300$i "
+    ips+="$((i-2)),10.10.$network.$i,1000$i "
 done
 
 for protocol in "${protocols[@]}"; do
-    log=testresults"${protocol}${input}"
+    log=testresults"${protocol}${size}"
     touch "$log"
     success=true
     skip=false
