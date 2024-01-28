@@ -109,7 +109,6 @@ SWAP=""
 TTYPES=()
 PIDS=()
 NUMBER_OF_BITS=(32)
-INPUT_SIZE=(100)
 # create a random network number to support multiple experiment runs 
 # on the same switch.   Generate random number  1 < number < 255
 NETWORK=$((RANDOM%253+2))
@@ -183,16 +182,12 @@ setParameters() {
             --n|--number_of_bits)
                 setArray NUMBER_OF_BITS "$2"
                 shift;;
-            --i|--input)
-                INPUT_SIZE= "$2"
-                shift;;
             --p|--protocol)
                 setArray PROTOCOLS "$2"
                 shift;;
             --swap)
                 SWAP="$2"
                 shift;;
-            
             --config)
                 parseConfig "$2" "$4"
                 exit 0;;
