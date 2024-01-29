@@ -39,7 +39,7 @@ exportExperimentResults() {
 
     # generate header line of data dump with column information
     basicInfo1="program;partysize"
-    basicInfo2="${dyncolumns}runtime_internal(s);runtime_external(s);peakRAM(MiB);jobCPU(%);ALLdataSent(MB)"
+    basicInfo2="${dyncolumns}runtime_internal(ms);runtime_external(s);peakRAM(MiB);jobCPU(%);ALLdataSent(MB),AllDataRec(MB);ALLmessagesSent,AllMessagesRec"
     echo -e "$basicInfo1;$basicInfo2" >> "$datatableShort"
     echo -e "$basicInfo1;$basicInfo2;multTripPresetup;multTripSetup;sharedPowerPresetup;sharedPowerSetup;sharedBitPresetup;sharedBitSetup;baseOT;otExtension;kk13OtExtension;preprocessingTime;gatesSetup;gatesOnline" >> "$datatableFull"
     # grab all the measurement information and append it to the datatable
@@ -79,10 +79,13 @@ exportExperimentResults() {
         dataSent=$(grep "Sent:" "$runtimeinfo" | awk '{print $2}')
         dataRec=$(grep "Received:" "$runtimeinfo" | awk '{print $2}')
         basicComm="${dataRec:-NA};${dataSent:-NA};"
+        messagesSent=$(grep "Sent:" "$runtimeinfo" | awk '{print $5}')
+        messagesRec=$(grep "Received:" "$runtimeinfo" | awk '{print $5}')
+        basicMes="${messagesRec:-NA};${messagesSent:-NA};"
 
         # put all collected info into one row (Short)
         basicInfo="${EXPERIMENT::2};$protocol;$partysize;"
-        echo -e "$basicInfo;$loopvalues$runtimeint;$runtimeext;$maxRAMused;$jobCPU;$basicComm" >> "$datatableShort"
+        echo -e "$basicInfo;$loopvalues$runtimeint;$runtimeext;$maxRAMused;$jobCPU;$basicComm,$basicMes" >> "$datatableShort"
 
         ## Full result measurement information
         ######
