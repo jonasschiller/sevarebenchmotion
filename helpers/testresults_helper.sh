@@ -60,7 +60,7 @@ exportExperimentResults() {
         partysize=${#NODES[*]}
         
         # get pos filepath of the measurements for the current loop
-        runtimeinfo=$(find "$resultpath" -name "testresults_run*$i" -print -quit)
+        runtimeinfo=$(find "$resultpath" -name "testresults*_run*$i" -print -quit)
         if [ ! -f "$runtimeinfo" ]; then
             styleOrange "    Skip - File not found error: runtimeinfo or compileinfo"
             continue 2
