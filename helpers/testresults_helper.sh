@@ -44,6 +44,8 @@ exportExperimentResults() {
     echo -e "$basicInfo1;$basicInfo2;multTripPresetup;multTripSetup;sharedPowerPresetup;sharedPowerSetup;sharedBitPresetup;sharedBitSetup;baseOT;otExtension;kk13OtExtension;preprocessingTime;gatesSetup;gatesOnline" >> "$datatableFull"
     # grab all the measurement information and append it to the datatable
    
+    for protocol in "${PROTOCOLS[@]}"; do
+
     i=0
     # get loopfile path for the current variables
     loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
@@ -60,7 +62,7 @@ exportExperimentResults() {
         partysize=${#NODES[*]}
         
         # get pos filepath of the measurements for the current loop
-        runtimeinfo=$(find "$resultpath" -name "testresults*_run*$i" -print -quit)
+        runtimeinfo=$(find "$resultpath" -name "testresults$protocol*_run*$i" -print -quit)
         if [ ! -f "$runtimeinfo" ]; then
             styleOrange "    Skip - File not found error: runtimeinfo or compileinfo"
             continue 2
@@ -110,6 +112,7 @@ exportExperimentResults() {
         # locate next loop file
         ((++i))
         loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
+    done
     done
     # check if there was something exported
     rowcount=$(wc -l "$datatableShort" | awk '{print $1}')
