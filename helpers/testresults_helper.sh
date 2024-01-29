@@ -11,8 +11,8 @@ resultpath="$RPATH/${NODES[0]}/"
 exportExperimentResults() {
 
     # set up location
-    datatableShort="$EXPORTPATH/data/E${EXPERIMENT::2}_short_results.csv"
-    datatableFull="$EXPORTPATH/data/E${EXPERIMENT::2}_full_results.csv"
+    datatableShort="$EXPORTPATH/data/$EXPERIMENT_short_results.csv"
+    datatableFull="$EXPORTPATH/data/$EXPERIMENT_full_results.csv"
     mkdir -p "$datatableShort"
     rm -rf "$datatableShort"
 
@@ -78,14 +78,14 @@ exportExperimentResults() {
 
         dataSent=$(grep "Sent:" "$runtimeinfo" | awk '{print $2}')
         dataRec=$(grep "Received:" "$runtimeinfo" | awk '{print $2}')
-        basicComm="${dataRec:-NA};${dataSent:-NA};"
+        basicComm="${dataRec:-NA};${dataSent:-NA}"
         messagesSent=$(grep "Sent:" "$runtimeinfo" | awk '{print $5}')
         messagesRec=$(grep "Received:" "$runtimeinfo" | awk '{print $5}')
-        basicMes="${messagesRec:-NA};${messagesSent:-NA};"
+        basicMes="${messagesRec:-NA};${messagesSent:-NA}"
 
         # put all collected info into one row (Short)
-        basicInfo="${EXPERIMENT::2};$protocol;$partysize;"
-        echo -e "$basicInfo;$loopvalues$runtimeint;$runtimeext;$maxRAMused;$jobCPU;$basicComm,$basicMes" >> "$datatableShort"
+        basicInfo="$EXPERIMENT;$protocol;$partysize"
+        echo -e "$basicInfo;$loopvalues$runtimeint;$runtimeext;$maxRAMused;$jobCPU;$basicComm;$basicMes" >> "$datatableShort"
 
         ## Full result measurement information
         ######
@@ -102,10 +102,10 @@ exportExperimentResults() {
         gatesSetup=$(grep "Gates Setup" "$runtimeinfo" | awk '{print $3}')
         gatesOnline=$(grep "Gates Online" "$runtimeinfo" | awk '{print $3}')
 
-        measurementvalues="$multTripPresetup;$multTripSetup;$sharedPowerPresetup;$sharedPowerSetup;$sharedBitPresetup;$sharedBitSetup;$baseOT;$otExtension;$kk13OtExtension;$preprocessingTime;$gatesSetup;$gatesOnline;"
+        measurementvalues="$multTripPresetup;$multTripSetup;$sharedPowerPresetup;$sharedPowerSetup;$sharedBitPresetup;$sharedBitSetup;$baseOT;$otExtension;$kk13OtExtension;$preprocessingTime;$gatesSetup;$gatesOnline"
 
         # put all collected info into one row (Full)
-        echo -e "$basicInfo;$compilevalues;$loopvalues$measurementvalues" >> "$datatableFull"
+        echo -e "$basicInfo;$loopvalues$runtimeint;$runtimeext;$maxRAMused;$jobCPU;$basicComm;$basicMes;$measurementvalues" >> "$datatableFull"
 
         # locate next loop file
         ((++i))
