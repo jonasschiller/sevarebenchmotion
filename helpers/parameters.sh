@@ -231,7 +231,7 @@ setParameters() {
         fi
     done
     # Experiment run summary  information output
-    SUMMARYFILE="$EXPORTPATH/$EXPERIMENT_run-summary.dat"
+    SUMMARYFILE="$EXPORTPATH/${EXPERIMENT}_run-summary.dat"
     mkdir -p "$EXPORTPATH" && rm -rf "$SUMMARYFILE"
     {
     echo "  Setup:"

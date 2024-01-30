@@ -11,8 +11,8 @@ resultpath="$RPATH/${NODES[0]}/"
 exportExperimentResults() {
 
     # set up location
-    datatableShort="$EXPORTPATH/data/$EXPERIMENT_short_results.csv"
-    datatableFull="$EXPORTPATH/data/$EXPERIMENT_full_results.csv"
+    datatableShort="$EXPORTPATH/data/${EXPERIMENT}_short_results.csv"
+    datatableFull="$EXPORTPATH/data/${EXPERIMENT}_full_results.csv"
     mkdir -p "$datatableShort"
     rm -rf "$datatableShort"
 
