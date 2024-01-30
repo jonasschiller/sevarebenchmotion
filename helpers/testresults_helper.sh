@@ -37,7 +37,7 @@ exportExperimentResults() {
         dyncolumns+=";"
     done
 
-    # generate header line of data dump with column information
+      # generate header line of data dump with column information
     basicInfo1="program;protocol;partysize"
     basicInfo2="${dyncolumns}runtime_internal(ms);runtime_external(s);peakRAM(MiB);jobCPU(%);ALLdataSent(MB),AllDataRec(MB);ALLmessagesSent,AllMessagesRec"
     echo -e "$basicInfo1;$basicInfo2" >> "$datatableShort"
@@ -62,7 +62,7 @@ exportExperimentResults() {
         partysize=${#NODES[*]}
         
         # get pos filepath of the measurements for the current loop
-        runtimeinfo=$(find "$resultpath" -name "testresults$protocol*_run*$i" -print -quit)
+        runtimeinfo=$(find "$resultpath" -name "testresults${protocol}*_run*$i" -print -quit)
         if [ ! -f "$runtimeinfo" ]; then
             styleOrange "    Skip - File not found error: runtimeinfo or compileinfo"
             continue 2
