@@ -35,7 +35,7 @@ echo 'unattended-upgrades unattended-upgrades/enable_auto_updates boolean false'
 export DEBIAN_FRONTEND=noninteractive
 apt update
 apt install -y automake build-essential cmake git libboost-dev libboost-thread-dev \
-    libntl-dev libsodium-dev libssl-dev libtool m4 texinfo yasm linux-cpupower \
+    libntl-dev libsodium-dev libssl-dev libtool m4 texinfo yasm \
     python3-pip time parted libomp-dev htop wget gnupg software-properties-common \
     lsb-release iperf3 
 pip3 install -U numpy

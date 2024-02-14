@@ -116,7 +116,7 @@ exportExperimentResults() {
 
         # locate next loop file
         ((++i))
-        if [ "$i" -lt 10 ]; then
+    if [ "$i" -lt 10 ]; then
     loopinfo=$(find "./" -name "*0$i.loop*" -print -quit)
     else
     loopinfo=$(find "./" -name "*$i.loop*" -print -quit)

@@ -81,6 +81,29 @@ setFrequency() {
     return 0
 }
 
+setAllParameters() {
+    latency=$(pos_get_variable latencies --from-loop)
+    bandwidth=$(pos_get_variable bandwidths --from-loop)
+    packetdrop=$(pos_get_variable packetdrops --from-loop)
+
+    NIC0=$(pos_get_variable "$(hostname)"NIC0 --from-global)
+    NIC1=$(pos_get_variable "$(hostname)"NIC1 --from-global) || NIC1=0
+
+   # Add root qdisc with packet loss
+tc qdisc add dev "$NIC0" root handle 1:0 netem loss "$packetdrop"%
+[ "$NIC1" != 0 ] && tc qdisc add dev "$NIC1" root handle 1:0 netem loss "$packetdrop"%
+
+# Add child qdisc with bandwidth control
+tc qdisc add dev "$NIC0" parent 1:0 handle 10: tbf rate "$bandwidth"mbit burst 50kb limit 50kb
+[ "$NIC1" != 0 ] && tc qdisc add dev "$NIC1" parent 1:0 handle 10: tbf rate "$bandwidth"mbit burst 50kb limit 50kb
+# Add another child qdisc with latency control
+if [ "$latency" -ne 0 ]; then
+    tc qdisc add dev "$NIC0" parent 10:1 handle 20: netem delay "$latency"ms
+    [ "$NIC1" != 0 ] && tc qdisc add dev "$NIC1" parent 10:1 handle 20: netem delay "$latency"ms 
+fi
+return 0
+}
+
 setLatencyBandwidth() {
 
     latency=$(pos_get_variable latencies --from-loop)
