@@ -67,7 +67,12 @@ exportExperimentResults() {
         partysize=${#NODES[*]}
         
         # get pos filepath of the measurements for the current loop
-        runtimeinfo=$(find "$resultpath" -name "testresults${protocol}*_run*$i" -print -quit)
+        if [ "$i" -lt 10 ]; then
+    runtimeinfo=$(find "$resultpath" -name "testresults${protocol}*_run0$i" -print -quit)
+    else
+    runtimeinfo=$(find "$resultpath" -name "testresults${protocol}*_run*$i" -print -quit)
+    fi
+        
         if [ ! -f "$runtimeinfo" ]; then
             styleOrange "    Skip - File not found error: runtimeinfo or compileinfo"
             continue 2
@@ -127,7 +132,7 @@ exportExperimentResults() {
     rowcount=$(wc -l "$datatableShort" | awk '{print $1}')
     if [ "$rowcount" -lt 2 ];then
         okfail fail "nothing to export"
-        rm "$datatableShort"
+        #rm "$datatableShort"
         return
     fi
 
