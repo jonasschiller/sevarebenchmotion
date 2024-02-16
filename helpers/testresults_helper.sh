@@ -49,9 +49,9 @@ exportExperimentResults() {
     i=0
     # get loopfile path for the current variables
     if [ "$i" -lt 10 ]; then
-    loopinfo=$(find "./" -name "*0$i.loop*" -print -quit)
+    loopinfo=$(find "$resultpath" -name "*0$i.loop*" -print -quit)
     else
-    loopinfo=$(find "./" -name "*$i.loop*" -print -quit)
+    loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
     fi
 
     echo "  exporting $protocol"
@@ -122,9 +122,9 @@ exportExperimentResults() {
         # locate next loop file
         ((++i))
     if [ "$i" -lt 10 ]; then
-    loopinfo=$(find "./" -name "*0$i.loop*" -print -quit)
+    loopinfo=$(find "$resultpath" -name "*0$i.loop*" -print -quit)
     else
-    loopinfo=$(find "./" -name "*$i.loop*" -print -quit)
+    loopinfo=$(find "$resultpath" -name "*$i.loop*" -print -quit)
     fi
     done
     done
