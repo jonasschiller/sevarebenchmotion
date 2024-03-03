@@ -85,7 +85,7 @@ for i in $(seq 2 $((partysize+1))); do
 done
 
 for protocol in "${protocols[@]}"; do
-    log=testresults"${protocol}${size}"
+    log=testresults"${protocol}"
     touch "$log"
     success=true
     skip=false
