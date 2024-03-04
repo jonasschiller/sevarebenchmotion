@@ -43,40 +43,80 @@ nic0=$(pos_get_variable "$(hostname)"NIC0 --from-global)
 nic1=$(pos_get_variable "$(hostname)"NIC1 --from-global) || nic1=0
 
 ips=()
-
 ######
 ### three nodes indirect connection topology setup
 ### node 2 --- node 1 --- node 3
 ### for 25G+ speeds set MTU
-if [ "$nic1" != 0 ] && [ "$nic2" != 0 ]  && [ "$groupsize" == 4 ]; then
+###if [ "$(hostname | grep -cE "gard|goracle|zone")" -eq 1 ]; then
+###
+###	# install ddp drivers
+###	installDriver
+###
+###	# store other participants ips
+###	for i in $(seq 2 $((groupsize+1))); do
+###		[ "$ipaddr" -ne "$i" ] && ips+=( "$i" )
+###	done
+###
+###	ip addr add 10.10."$network"."$ipaddr"/24 dev "$nic0"
+###	ip link set dev "$nic0" mtu 9700
+###	ip link set dev "$nic0" up
+###
+###	if [ "$ipaddr" -eq 2 ]; then
+###		# activate forwarding for the center node
+###		sysctl -w net.ipv4.ip_forward=1
+###		ip addr add 10.10."$network"."$ipaddr"/24 dev "$nic1"
+###		ip link set dev "$nic1" mtu 9700
+###		ip link set dev "$nic1" up
+###		# route via correct NICs
+###		ip route add 10.10."$network".3 dev "$nic0"
+###		ip route add 10.10."$network".4 dev "$nic1"
+###	# this is probably not required since the routes should be set automatically
+###	elif [ "$ipaddr" -eq 3 ]; then
+###		ip route add 10.10."$network".4 via 10.10."$network".2
+###	else
+###		ip route add 10.10."$network".3 via 10.10."$network".2
+###	fi
+#### three nodes direct connection topology if true
+###elif [ "$nic1" != 0 ]; then
+######
+# four nodes direct connection topology if true
+if [ "$nic1" != 0 ] && [ "$nic2" != 0 ] && [ "$groupsize" == 4 ]; then
 
-	# install ddp drivers
-	installDriver
+	# to achieve high speeds, install ddp drivers
+	highspeed=$(hostname | grep -cE "idex|meld|tinyman|yieldly|algofi|gard|goracle|zone")
+	[ "$highspeed" -eq 1 ] && installDriver
 
-	# store other participants ips
-	for i in $(seq 2 $((groupsize+1))); do
-		[ "$ipaddr" -ne "$i" ] && ips+=( "$i" )
-	done
+	sleep 20
+
+	# verify that nodes array is circularly sorted
+	# this is required for the definition of this topology
+	
+	# specify the ip pair to create the network routes to
+	# it's not the ip that is being set to this host
+	[ "$ipaddr" -eq 2 ] && ips+=( 3 4 5 )
+	[ "$ipaddr" -eq 3 ] && ips+=( 4 5 2 )
+	[ "$ipaddr" -eq 4 ] && ips+=( 5 2 3 )
+	[ "$ipaddr" -eq 5 ] && ips+=( 2 3 4 )
 
 	ip addr add 10.10."$network"."$ipaddr"/24 dev "$nic0"
-	ip link set dev "$nic0" mtu 9700
-	ip link set dev "$nic0" up
+	ip addr add 10.10."$network"."$ipaddr"/24 dev "$nic1"
+	ip addr add 10.10."$network"."$ipaddr"/24 dev "$nic2"
 
-	if [ "$ipaddr" -eq 2 ]; then
-		# activate forwarding for the center node
-		sysctl -w net.ipv4.ip_forward=1
-		ip addr add 10.10."$network"."$ipaddr"/24 dev "$nic1"
+	ip link set dev "$nic0" up
+	ip link set dev "$nic1" up
+	ip link set dev "$nic2" up
+
+	ip route add 10.10."$network"."${ips[0]}" dev "$nic0"
+	ip route add 10.10."$network"."${ips[1]}" dev "$nic1"
+	ip route add 10.10."$network"."${ips[2]}" dev "$nic2"
+
+	# to achieve high speeds, increase mtu
+	if [ "$highspeed" -eq 1 ]; then
+		ip link set dev "$nic0" mtu 9700
 		ip link set dev "$nic1" mtu 9700
-		ip link set dev "$nic1" up
-		# route via correct NICs
-		ip route add 10.10."$network".3 dev "$nic0"
-		ip route add 10.10."$network".4 dev "$nic1"
-	# this is probably not required since the routes should be set automatically
-	elif [ "$ipaddr" -eq 3 ]; then
-		ip route add 10.10."$network".4 via 10.10."$network".2
-	else
-		ip route add 10.10."$network".3 via 10.10."$network".2
+		ip link set dev "$nic2" mtu 9700
 	fi
+
 # three nodes direct connection topology if true
 elif [ "$nic1" != 0 ] && [ "$groupsize" == 3 ]; then
 ##### three nodes direct connection topology if true
