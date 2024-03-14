@@ -25,9 +25,7 @@ read -r -a types <<< "$2"
 network="$3"
 partysize="$4"
 experiment="$5"
-number_of_bits="$6"
-read -r -a input <<< "$7"
-read -r -a protocols <<< "$8"
+read -r -a protocols <<< "$7"
 # default to etype 1 if unset
 etype=${etype:-1}
 cd "$REPO_DIR"/build/bin
@@ -118,7 +116,7 @@ case " ${types[*]} " in
     *" RAM "*)
         unlimitRAM;;&
     *" BANDWIDTHS "*|*" LATENCIES "*|*" PACKETDROPS "*)
-    	resetTrafficControl;;&
+    	resetTrafficControl "$partysize";;&
     *" CPUS "*)
         unlimitCPUs
 esac

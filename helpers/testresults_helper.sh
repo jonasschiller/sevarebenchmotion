@@ -39,7 +39,7 @@ exportExperimentResults() {
 
       # generate header line of data dump with column information
     basicInfo1="program;protocol;partysize"
-    basicInfo2="${dyncolumns}runtime_internal(ms);runtime_external(s);peakRAM(MiB);jobCPU(%);ALLdataSent(MB),AllDataRec(MB);ALLmessagesSent,AllMessagesRec"
+    basicInfo2="${dyncolumns}runtime_internal(ms);runtime_external(s);peakRAM(MiB);jobCPU(%);ALLdataSent(MB);AllDataRec(MB);ALLmessagesSent;AllMessagesRec"
     echo -e "$basicInfo1;$basicInfo2" >> "$datatableShort"
     echo -e "$basicInfo1;$basicInfo2;multTripPresetup;multTripSetup;sharedPowerPresetup;sharedPowerSetup;sharedBitPresetup;sharedBitSetup;baseOT;otExtension;kk13OtExtension;preprocessingTime;gatesSetup;gatesOnline" >> "$datatableFull"
     # grab all the measurement information and append it to the datatable
