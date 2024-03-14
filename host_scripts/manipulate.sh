@@ -168,7 +168,7 @@ unlimitRAM() {
 }
 
 resetTrafficControl() {
-    $partysize=$1
+    partysize=$1
     NIC0=$(pos_get_variable "$(hostname)"NIC0 --from-global)
     NIC1=$(pos_get_variable "$(hostname)"NIC1 --from-global) || NIC1=0
     tc qdisc delete dev "$NIC0" root
