@@ -25,7 +25,7 @@ read -r -a types <<< "$2"
 network="$3"
 partysize="$4"
 experiment="$5"
-read -r -a protocols <<< "$7"
+read -r -a protocols <<< "$6"
 # default to etype 1 if unset
 etype=${etype:-1}
 cd "$REPO_DIR"/build/bin

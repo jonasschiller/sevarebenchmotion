@@ -76,9 +76,9 @@ runExperiment() {
 		echo "    execute experiment on host $node..."
 		# the reset removes the compiled binaries, to make place for the next comp domain
 		# send all ip addresses so it can be formated into the motion style execution
-		{ 	"$POS" comm laun --blocking "$node" -- /bin/bash "$path"/experiment-reset.sh;
+		{ 
 			"$POS" comm laun --blocking --loop "$node" -- \
-				/bin/bash "$script" "$player" "${TTYPES[*]}" "$NETWORK" "${#NODES[*]}" "$EXPERIMENT" "${INPUTS[0]}" "${PROTOCOLS[*]}";
+				/bin/bash "$script" "$player" "${TTYPES[*]}" "$NETWORK" "${#NODES[*]}" "$EXPERIMENT" "${PROTOCOLS[*]}";
 		} &
 		PIDS+=( $! )
 		((++player))
