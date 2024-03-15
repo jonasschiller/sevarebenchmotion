@@ -41,6 +41,7 @@ installDriver() {
 
 nic0=$(pos_get_variable "$(hostname)"NIC0 --from-global)
 nic1=$(pos_get_variable "$(hostname)"NIC1 --from-global) || nic1=0
+nic2=$(pos_get_variable "$(hostname)"NIC2 --from-global) || nic2=0
 
 ips=()
 ######
